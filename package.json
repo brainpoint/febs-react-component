@@ -1,0 +1,20 @@
+{
+  "name": "citong-react-component",
+  "version": "0.0.1",
+  "license": "BSD-3-Clause",
+  "homepage": "https://github.com/brainpoint/citong-react-component#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/brainpoint/citong-react-component.git"
+  },
+  "keywords": [
+    "react-native",
+    "react",
+    "citong-react-web",
+    "citong-react-component"
+  ],
+  "peerDependencies": {
+    "react": "^15.1",
+    "react-dom": "^15.1"
+  }
+}
