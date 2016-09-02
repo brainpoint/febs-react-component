@@ -26,6 +26,9 @@ var screen = {
 };
 
 var g_instance;
+var g_buttonContainerStyle;
+var g_viewStyle;
+var g_toastViewStyle;
 var view_width  = 280;
 var view_height = 177;
 var view_btn_height = 44;
@@ -37,21 +40,29 @@ export default class AlertView extends Component {
   constructor(props) {
     super(props);
     g_instance = this;
-    this.timerMgr = new TimerMgr();
+    this.___timerMgr = new TimerMgr();
 
-    this.state = {__alertViewOpacity:new Animated.Value(0), __alertViewHidden:true};
+    this.state = {
+      __alertViewOpacity:new Animated.Value(0),
+      __alertViewHidden:true,
+      __toastViewOpacity:new Animated.Value(0),
+      __toastViewHidden:true,
+    };
     this.show = this.show.bind(this);
+    this.toast = this.toast.bind(this);
     this.hide = this.hide.bind(this);
     this.__getContentElement = this.__getContentElement.bind(this);
     this.__getButtonsElement = this.__getButtonsElement.bind(this);
     this.__getAlertViewElement = this.__getAlertViewElement.bind(this);
+    this.__getToastContentElement = this.__getToastContentElement.bind(this);
+    this.__getToastViewElement = this.__getToastViewElement.bind(this);
   }
 
   componentDidMount() {
   }
 
   componentWillUnmount() {
-    this.timerMgr.dispose();
+    this.___timerMgr.dispose();
   }
 
   /**
@@ -61,16 +72,22 @@ export default class AlertView extends Component {
     return (
       <View style={{flex:1}}>
         {this.props.children}
-
-        {this.state.__alertViewHidden?
-          null
-          :
+      
+        {/** alert */}
+        {this.state.__alertViewHidden ? null :
           (
             <Animated.View style={{flex:1, opacity:this.state.__alertViewOpacity,position:'absolute',left:0,top:0, width:screen.width,height:screen.height}}>
               <View style={styles.backViewContainer}>
               </View>
               {this.__getAlertViewElement()}
             </Animated.View>
+          )
+        }
+
+        {/** toast */}
+        {this.state.__toastViewHidden ? null :
+          (
+            this.__getToastViewElement()
           )
         }
       </View>
@@ -80,8 +97,8 @@ export default class AlertView extends Component {
   show(content, buttonArray, buttonContainerStyle, viewStyle) {
     this._av_content = content;
     this._av_buttonArray = buttonArray;
-    this._av_buttonContainerStyle = buttonContainerStyle;
-    this._av_viewStyle = viewStyle;
+    this._av_buttonContainerStyle = buttonContainerStyle || g_buttonContainerStyle;
+    this._av_viewStyle = viewStyle || g_viewStyle;
 
     this.setState({__alertViewHidden:false});
     Animated.timing(this.state.__alertViewOpacity, {
@@ -91,13 +108,55 @@ export default class AlertView extends Component {
             }).start();
   };
 
+  toast(content, timeoutHide, viewStyle) {
+    this._av_content_toast = content;
+    this._av_viewStyle_toast = viewStyle || g_toastViewStyle;
+
+    this.___timerMgr.clearAll();
+
+    const foo = ()=>{
+      // show.
+      this.setState({__toastViewHidden:false});
+      Animated.timing(this.state.__toastViewOpacity, {
+                  toValue: 0.8,
+                  easing: Easing.linear,
+                  duration: 150
+              }).start();
+
+      // hide.
+      this.___timerMgr.setTimeout(()=>{
+          Animated.timing(this.state.__toastViewOpacity, {
+            toValue: 0,
+            easing: Easing.linear,
+            duration: 250
+          }).start();
+
+          this.___timerMgr.setTimeout(()=>{this.setState({__toastViewHidden:true});}, 250);
+      }, (timeoutHide||2000));
+    };
+
+    // is show.
+    if (!this.state.__toastViewHidden) {
+      Animated.timing(this.state.__toastViewOpacity, {
+                  toValue: 0,
+                  easing: Easing.linear,
+                  duration: 100
+              }).start();
+      this.___timerMgr.setTimeout(()=>{
+          foo();
+      }, 110);
+    } else {
+      foo();
+    }
+  }
+
   hide() {
     Animated.timing(this.state.__alertViewOpacity, {
                 toValue: 0,
                 easing: Easing.linear,
                 duration: 150
             }).start();
-    this.timerMgr.setTimeout(()=>{this.setState({__alertViewHidden:true});}, 150);
+    this.___timerMgr.setTimeout(()=>{this.setState({__alertViewHidden:true});}, 150);
   }
 
   isHidden() {
@@ -240,6 +299,51 @@ export default class AlertView extends Component {
         </ScrollView>
       );
   }
+
+
+  /**
+  * @desc: 
+  * @return: 
+  */
+  __getToastContentElement() {
+    const d = this._av_content_toast ? ((!!this._av_content_toast.props)?this._av_content_toast:null) : null;
+    
+    if (d || !this._av_content_toast) {
+      return this._av_content_toast;
+    }
+
+    const tt = this._av_content_toast.text;
+    const sty   = this._av_content_toast.style;
+    const tintColor   = this._av_content_toast.tintColor;
+    const tintColors  = tintColor ? {color:tintColor} : null;
+
+    var t = (<Text numberOfLines={1} lineBreakMode='tail' 
+          style={[styles.toastContentTextContainer, tintColors, sty ]}>
+          {tt}
+        </Text>);
+
+    return (
+      <View style={styles.toastContentContainer}>
+        {t}
+      </View>
+    );
+  }
+
+  /**
+  * @desc: 
+  * @return: 
+  */
+  __getToastViewElement() {
+    var viewStyle = this._av_viewStyle_toast;
+
+    var sh2 = {top:20, justifyContent:'flex-start', alignItems:'flex-start', height:40, opacity:this.state.__toastViewOpacity};
+
+    return (
+      <Animated.View style={[styles.toastViewContainer, sh2, viewStyle]}>
+        {this.__getToastContentElement()}
+      </Animated.View>
+    );
+  }
 }
 
 /**
@@ -305,6 +409,33 @@ const styles = StyleSheet.create({
     fontSize:       18, 
     color:          '#0076FF',
   },
+  toastViewContainer: {
+    flex:            1,
+    top:             20,
+    position:        'absolute',
+    right:           (screen.width-view_width)/2,
+    bottom:          (screen.height-view_height)/2 + 30,
+    flexDirection:   'column',
+    alignItems:      'center',
+    justifyContent:  'flex-start',
+    width:           view_width,
+    height:          40,
+    backgroundColor: '#1a1a1a',
+    borderRadius:    6,
+    borderWidth:     1,
+    zIndex:          2000000
+  },
+  toastContentTextContainer: {
+    fontSize:       14, 
+    color:          '#fff',
+    textAlign:      'center',
+  },
+  toastContentContainer: {
+    height:          view_height-view_btn_height,
+    width:           view_width,
+    padding:         5,
+    justifyContent:  'center',
+  },
 });
 
 
@@ -326,3 +457,13 @@ AlertView.hide = function() {
 AlertView.isHidden = function() {
   return !g_instance || g_instance.isHidden();
 }
+
+AlertView.setDefaultStyle = function(buttonContainerStyle, viewStyle, toastViewStyle) {
+  g_buttonContainerStyle = buttonContainerStyle;
+  g_viewStyle = viewStyle;
+  g_toastViewStyle = toastViewStyle;
+}
+
+AlertView.toast = function(content, timeoutHide, viewStyle) {
+  g_instance && g_instance.toast(content, timeoutHide, viewStyle);
+};

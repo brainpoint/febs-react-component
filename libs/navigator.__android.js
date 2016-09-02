@@ -56,7 +56,6 @@ NavbarButton.defaultProps = {
   style: {},
   text: '',
   tintColor: '#0076FF',
-  onPress: () => ({}),
 };
 
 
@@ -77,10 +76,9 @@ function customizeStatusBar(data) {
   }
 }
 
-function getButtonElement(data, btn, style, textAuto, defaultBarLeftButtonTextAuto, hasBack) {
+function getButtonElement(data, btn, style, textAuto, defaultBarLeftButtonTextAuto, hasBack, onPress) {
   const sty   = (btn?btn.style:null) || (data?data.style:null);
-  const tintColor   = ((btn?btn.tintColor:null) || (data?data.tintColor:null));
-  const onPress     = (btn?btn.onPress:null) || (data?data.onPress:null);
+  const tintColor   = (((btn?btn.tintColor:null) || (data?data.tintColor:null))) || NavbarButton.defaultProps.tintColor;
 
   let autoBack = false;
   let text = (btn?btn.text:null);
@@ -94,7 +92,7 @@ function getButtonElement(data, btn, style, textAuto, defaultBarLeftButtonTextAu
     text = text||(data?data.text:null);
   }  
 
-  const d = btn ? ((!!btn.props)?btn:null) : (data?((!!data.props)?data:null):null);
+  const d = btn ? ((!!btn.props)?btn:null) : (data?((!!data.props)?data:null):null);  
   return (
     <TouchableOpacity onPress={onPress}>
     <View style={[styles.debug, styles.navBarButtonContainer]}>
@@ -145,6 +143,7 @@ class Navigator extends Component {
     Navigator.Instance = this;
     this._getNavBarRender = this._getNavBarRender.bind(this);
     this._getCurNavHidden = this._getCurNavHidden.bind(this);
+    this._getCurRoute = this._getCurRoute.bind(this);
   }
 
   componentDidMount() {
@@ -200,6 +199,45 @@ class Navigator extends Component {
   }
   get barTintColor() {
     return (this.state&&this.state.barTintColor)||this.props.defaultBarTintColor||'#ffffff';
+  }
+
+  /**
+  * @desc: 
+  * @return: 
+  */
+  set onLeftButtonPress(c) {
+    var cr = this._getCurRoute();
+    if (cr) {
+      cr.onLeftButtonPress = c;
+      this.setState({});
+    }
+  }
+  get onLeftButtonPress() {
+    var cr = this._getCurRoute();
+    if (cr) {
+      return cr.onLeftButtonPress;
+    }
+    return null;
+  }
+
+
+  /**
+  * @desc: 
+  * @return: 
+  */
+  set onRightButtonPress(c) {
+    var cr = this._getCurRoute();
+    if (cr) {
+      cr.onRightButtonPress = c;
+      this.setState({});
+    }
+  }
+  get onRightButtonPress() {
+    var cr = this._getCurRoute();
+    if (cr) {
+      return cr.onRightButtonPress;
+    }
+    return null;
   }
   
   /**
@@ -257,17 +295,27 @@ class Navigator extends Component {
       this.setState({});
     }
   }
-  
-  _getCurNavHidden(curRoute=null) {
-    var has = this.state.navigationBarHidden;
-    
+
+  _getCurRoute(curRoute) {
     if (this.refs.nav)
     {
       let route = curRoute;
       if (!route) {
         let routes = this.refs.nav.getCurrentRoutes();
         route = routes[routes.length-1];
+        return route;
       }
+      return route;
+    }
+    return null;
+  }
+  
+  _getCurNavHidden(curRoute=null) {
+    var has = this.state.navigationBarHidden;
+    
+    if (this.refs.nav)
+    {
+      let route = this._getCurRoute(curRoute);
       if (route && (route.barHidden===true||route.barHidden===false))
       {
         has = route.barHidden;
@@ -302,9 +350,34 @@ class Navigator extends Component {
                   }
                 }
 
-                return getButtonElement(this.props.defaultBarLeftButton, route.barLeftButton, {marginLeft:8}, text, this.props.defaultBarLeftButtonTextAuto, hasBack); 
+                const btn = route.barLeftButton; 
+                let onPress     = route.onLeftButtonPress ||
+                                  (
+                                    btn
+                                    ?(
+                                      btn.onPress ||
+                                       (
+                                          this.props.defaultBarLeftButton&&this.props.defaultBarLeftButton.onPress 
+                                            ? this.props.defaultBarLeftButton.onPress 
+                                            : ((navi)=>this.pop())
+                                       )
+                                     )
+                                    :((navi)=>this.pop())
+                                  );                
+                return getButtonElement(this.props.defaultBarLeftButton, route.barLeftButton, {marginLeft:8}, text, this.props.defaultBarLeftButtonTextAuto, hasBack, onPress); 
               },
-              RightButton: (route, navigator, index, navState) => { return getButtonElement(this.props.defaultBarRightButton, route.barRightButton, {marginRight:8}); },
+              RightButton: (route, navigator, index, navState) => {
+                const btn = route.barRightButton;
+                let onPress     = route.onRightButtonPress ||
+                                   (btn?btn.onPress:
+                                      (
+                                        this.props.defaultBarRightButton&&this.props.defaultBarRightButton.onPress 
+                                        ? this.props.defaultBarRightButton.onPress 
+                                        : null
+                                      )
+                                     );   
+                return getButtonElement(this.props.defaultBarRightButton, route.barRightButton, {marginRight:8}, null, null, null, onPress); 
+              },
             }}
             style={[styles.debug, styles.navBar, {backgroundColor: this.barTintColor}, {zIndex:1}, styles.split]}
           />
@@ -323,7 +396,7 @@ class Navigator extends Component {
         configureScene = {(route, routeStack) => { return (route.configureScene?route.configureScene:this.props.configureScene); } }
         navigationBar = {this._getNavBarRender()}
         renderScene = {(route, navigator) => {
-          return <route.component {...route.passProps}/> 
+          return <route.component ref={comp=>this._comp=comp} {...route.passProps}/> 
         }}
         sceneStyle = {contentOffset}
         initialRoute = {this.props.initialRoute}
@@ -360,6 +433,7 @@ const StatusBarShape = {
   hideAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ]),
   showAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ])
 };
+
 
 Navigator.SceneConfigs = ReactNative.Navigator.SceneConfigs;
 Navigator.propTypes = {

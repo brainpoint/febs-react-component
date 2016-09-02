@@ -56,6 +56,10 @@ AppRegistry.registerComponent('app', () => app);
       对话框当前是否是隐藏.
 *
 //-------------
+*   AlertView.setDefaultStyle(buttonContainerStyle, viewStyle, toastViewStyle);
+      设置全局默认样式.
+*
+//-------------
 *   AlertView.show(content, buttonArray = null, buttonContainerStyle = null, viewStyle = null)
       显示对话框.
       @param content 显示的内容.
@@ -78,6 +82,21 @@ AppRegistry.registerComponent('app', () => app);
         2.或者为react元素，如<Text></Text>
       @param buttonContainerStyle 按钮数组的容器样式. 默认样式为 2个按钮以下按行排列, 2个按钮以上按列排列.
         PropTypes.object
+      @param viewStyle 警告框样式.
+        PropTypes.object
+*
+//-------------
+*   AlertView.toast(content, timeoutHide = 2000, viewStyle = null)
+      显示提示框.
+      @param content 显示的内容.
+        1.属性对象
+          {
+            text:       PropTypes.string,
+            tintColor:  PropTypes.string,
+            style:      PropTypes.object,
+          }
+        2.或者为react元素，如<Text></Text>
+      @param timeoutHide 多久之后关闭
       @param viewStyle 警告框样式.
         PropTypes.object
 *

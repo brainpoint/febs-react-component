@@ -68,10 +68,14 @@ AppRegistry.registerComponent('app', () => app);
 *   defaultBarLeftButton / defaultBarRightButton:
       1.属性对象
         { 
-          text:     PropTypes.string.isRequired,
-          tintColor:PropTypes.string,
-          onPress:  PropTypes.func,   function(navigator)
-          style:    PropTypes.object,
+          text:             PropTypes.string.isRequired,
+          tintColor:        PropTypes.string,
+          onPress:          PropTypes.func,   方法形式为 function(navigator),
+                                              如果对象存在属性 onLeftButtonPress/onRightButtonPress 则使用属性指定的方法, 
+                                              否则才使用此属性指定的方法; 
+                                              寻找按钮事件的顺序为: navigator.onLeftButtonPress > route.barLeftButton.onPress > defaultBarLeftButton.onPress
+                                              如果任何事件都没有, leftButton默认为pop()后退.
+          style:            PropTypes.object,
         }
       2.或者为react元素，如<Text></Text>
 *
@@ -145,6 +149,10 @@ AppRegistry.registerComponent('app', () => app);
 //-------------
 *   get/set navigationBarHidden :bool
       设置导航栏的状态.
+//-------------
+*   get/set onLeftButtonPress / onRightButtonPress :func
+      当前页面的导航按钮的事件处理函数. 形式为 function(navigator),
+      在其他组件中绑定导航按钮处理事件时,最好在componentWillMount中绑定 
 //-------------
 // (ios only)
 *   get/set interactivePopGestureEnbaled:  PropTypes.bool

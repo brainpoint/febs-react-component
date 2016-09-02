@@ -10,6 +10,7 @@
 *     - 在constructor中:          this.timerMgr = new TimerMgr();
 *     - 在componentWillUnmount中: this.timerMgr.dispose();
 *     - 在使用计时器的函数中调用:   var t = this.timerMgr.setTimeout(fn, tm) / this.timerMgr.clearTimeout(t)
+*     - 清理全部使用: this.timerMgr.clearAll();
 */
 export default class {
   constructor() {
@@ -44,6 +45,14 @@ export default class {
     if (t)
       this._timeoutList.push(t);
     return t;
+  }
+
+  clearAll() {
+    for(let t of this._timeoutList) {
+      if (t) {
+        clearTimeout(t);
+      }
+    }
   }
 
   clearTimeout(t) {

@@ -1,6 +1,6 @@
 # Citong React Component
 
-> A component framework for React Native and React Web.
+> A component framework for React Native / React Web.
 
 ### example
   see the files in path: ./demo/*.*
@@ -34,6 +34,8 @@
   ```
 
 ### React Native/Web compatible
+
+see demo.
 
 #### Components
 * AlertView

@@ -32,6 +32,36 @@ function getIconSearch(style=null) {
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
+function getIconChecked(style=null) {
+  var img = require('../images/checked.js');
+  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
+}
+
+function getIconUnCheck(style=null) {
+  var img = require('../images/uncheck.js');
+  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
+}
+
+function getIconEdit(style=null) {
+  var img = require('../images/edit.js');
+  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
+}
+
+function getIconDelete(style=null) {
+  var img = require('../images/delete.js');
+  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
+}
+
+function getIconRight(style=null) {
+  var img = require('../images/right.js');
+  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
+}
+
 function getIconMinArrowRight(style=null) {
   return (<Image source={{uri:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAYAAACEYr13AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpGMjRDRjgxMDA2NTkxMUUzOTlGODg2Qjk3NUJENUU1RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo4RjRCMjFGNjA2RTAxMUUzOTlGODg2Qjk3NUJENUU1RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkYyNENGODBFMDY1OTExRTM5OUY4ODZCOTc1QkQ1RTVEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkYyNENGODBGMDY1OTExRTM5OUY4ODZCOTc1QkQ1RTVEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+19PHKwAAAWZJREFUeNpi+P//PwMy3rFjR9zHjx/zgOwgIGZDl0fHTAxIYMuWLbnPnz+fu23btqJPnz7JAYV8gJiNAQ9gBJkCAmvXrs0CapoMZIIN5eTkfOjl5TWBj4/vIZC7FYh/4TRg/vz59kD2XiBmRpYkxhCYASCNC4A4Bl0BuiFAtSiGwMLgLxAnAPESdAO+f/8uDwyTAqD35IFc78TERDZsBiAbspQUQ5jQ1IIMiSfFEFgYoKsHhclCII4mFCZMOKKXWJcosOBJI3/FxMRS37596/b3719RdEOOHDnC9/Lly1u4XMAgISHB8fXr153omkFAUFBwElBzE4jNgkvz58+f9wANsMam+f379/kwPgsOzfuBmi0IacaIRgUFBU5g4BwiVjOKAUDNPK9evTr87ds3U2I1I3uB68mTJ1v//PljTIpmZBfYATVbk6oZ2YAdQJwMTUBEa0YPRFDSTQEZwsHB0UyMZhAACDAA4IAAH4fdRdAAAAAASUVORK5CYII='}} style={[{width:8, height:10}, style]}/>);
 }
@@ -63,3 +93,8 @@ exports.getIconMinArrowLeft     = getIconMinArrowLeft;
 exports.getIconClose            = getIconClose;
 exports.getIconCloseCircle      = getIconCloseCircle;
 exports.getIconSearch           = getIconSearch;
+exports.getIconChecked          = getIconChecked;
+exports.getIconUnCheck          = getIconUnCheck;
+exports.getIconEdit             = getIconEdit;
+exports.getIconDelete           = getIconDelete;
+exports.getIconRight            = getIconRight;
