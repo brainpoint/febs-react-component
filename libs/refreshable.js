@@ -11,7 +11,8 @@ import {
     Dimensions,
     StyleSheet,
     ActivityIndicator,
-    Platform
+    Platform,
+    UIManager
 } from 'react-native';
 
 // const padding = 2; //scrollview与外面容器的距离
@@ -53,6 +54,8 @@ export default class extends Component {
             onPanResponderRelease: this.onPanResponderRelease.bind(this),
             onPanResponderTerminate: this.onPanResponderRelease.bind(this),
         });
+        this.scrollToBottom = this.scrollToBottom.bind(this);
+        this.scrollToTop = this.scrollToTop.bind(this);
     }
 
     onShouldSetPanResponder(e, gesture) {
@@ -72,8 +75,9 @@ export default class extends Component {
                 this.resetDefaultXYHandler()
             } else if(this.props.onPushing && this.props.onPushing(this.state.gesturePosition)) {
                 // do nothing, handling by this.props.onPushing
-            } else {
-                this.scroll.scrollTo({x:0, y: gesture.dy * -1});
+            } else {                
+                this.scroll.scrollTo({y: gesture.dy * -1, animated:false});
+                // this.state.pullPan.setOffset({x: 0, y: gesture.dy});
             }
             return;
         } else if (isDownGesture(gesture.dx, gesture.dy)) { //下拉
@@ -111,10 +115,53 @@ export default class extends Component {
 
     onScroll(e) {
         if (e.nativeEvent.contentOffset.y <= 0) {
-            this.setState({scrollEnabled: this.defaultScrollEnabled});
+            if (this.state.scrollEnabled != this.defaultScrollEnabled)
+                this.setState({scrollEnabled: this.defaultScrollEnabled});
         } else if(!this.isPullState()) {
             this.setState({scrollEnabled: true});
         }
+    }
+
+    scrollToBottom() {
+        // scroll to bottom.
+        var innerScrollView = this.scroll.getScrollResponder().getInnerViewNode();
+        var scrollView = this.scroll.getScrollResponder().getScrollableNode();
+
+        UIManager.measure(innerScrollView,
+            (...arg) => {// x y width height pageX pageY
+                let contentHeight = arg[3];
+                let innerScrollViewY = arg[1];
+                UIManager.measure(scrollView,
+                    (...arg2) => { // scrollViewX, scrollViewY, scrollViewWidth, scrollViewHeight
+                        let scrollHeight = arg2[3];
+                        if (contentHeight >= scrollHeight) { // 小于等于0说明没有滚动条不用滚动
+                            let scrollY = contentHeight - scrollHeight + innerScrollViewY;// 内容高-容器高
+                            this.scroll.scrollTo({y: scrollY});
+                        }
+                    });
+            }
+        );
+    }
+
+    scrollToTop() {
+        // scroll to top.
+        var innerScrollView = this.scroll.getScrollResponder().getInnerViewNode();
+        var scrollView = this.scroll.getScrollResponder().getScrollableNode();
+
+        UIManager.measure(innerScrollView,
+            (...arg) => {// x y width height pageX pageY
+                let contentHeight = arg[3];
+                let innerScrollViewY = arg[1];
+                UIManager.measure(scrollView,
+                    (...arg2) => { // scrollViewX, scrollViewY, scrollViewWidth, scrollViewHeight
+                        let scrollHeight = arg2[3];
+                        if (contentHeight >= scrollHeight) { // 小于等于0说明没有滚动条不用滚动
+                            //let scrollY = contentHeight - scrollHeight + innerScrollViewY;// 内容高-容器高
+                            this.scroll.scrollTo({y: -innerScrollViewY});
+                        }
+                    });
+            }
+        );
     }
 
     isPullState() {
@@ -124,6 +171,8 @@ export default class extends Component {
     resetDefaultXYHandler() {
         this.setState({pulling: false, pullok: false, pullrelease: false});
         this.state.pullPan.setValue(this.defaultXY);
+
+        this.scrollToTop();
     }
 
     componentWillUpdate(nextProps, nextState) {

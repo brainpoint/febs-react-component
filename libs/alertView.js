@@ -336,7 +336,7 @@ export default class AlertView extends Component {
   __getToastViewElement() {
     var viewStyle = this._av_viewStyle_toast;
 
-    var sh2 = {top:20, justifyContent:'flex-start', alignItems:'flex-start', height:40, opacity:this.state.__toastViewOpacity};
+    var sh2 = {top:20, justifyContent:'flex-start', alignItems:'flex-start', opacity:this.state.__toastViewOpacity};
 
     return (
       <Animated.View style={[styles.toastViewContainer, sh2, viewStyle]}>
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     bottom:          (screen.height-view_height)/2 + 30,
     flexDirection:   'column',
     alignItems:      'center',
-    justifyContent:  'flex-start',
+    justifyContent:  'center',
     width:           view_width,
     height:          40,
     backgroundColor: '#1a1a1a',
@@ -426,15 +426,17 @@ const styles = StyleSheet.create({
     zIndex:          2000000
   },
   toastContentTextContainer: {
+    flex:           1,
     fontSize:       14, 
     color:          '#fff',
     textAlign:      'center',
   },
   toastContentContainer: {
-    height:          view_height-view_btn_height,
+    height:          35,
     width:           view_width,
     padding:         5,
     justifyContent:  'center',
+    alignItems:      'center',
   },
 });
 
