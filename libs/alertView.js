@@ -175,7 +175,8 @@ export default class AlertView extends Component {
     this._av_content_toast = content;
     this._av_viewStyle_toast = viewStyle || g_toastViewStyle;
 
-    this.___timerMgr.clearAll();
+    this.___timerMgr.clearTimeout(this.__timerToast);
+    this.___timerMgr.clearTimeout(this.__timerToast2);
 
     const foo = ()=>{
       // showAlert.
@@ -187,14 +188,14 @@ export default class AlertView extends Component {
               }).start();
 
       // hide.
-      this.___timerMgr.setTimeout(()=>{
+      this.__timerToast = this.___timerMgr.setTimeout(()=>{
           Animated.timing(this.state.__toastViewOpacity, {
             toValue: 0,
             easing: Easing.linear,
             duration: 250
           }).start();
 
-          this.___timerMgr.setTimeout(()=>{this.setState({__toastViewHidden:true});}, 250);
+          this.__timerToast = this.___timerMgr.setTimeout(()=>{this.setState({__toastViewHidden:true});}, 250);
       }, (timeoutHide||2000));
     };
 
@@ -205,7 +206,7 @@ export default class AlertView extends Component {
                   easing: Easing.linear,
                   duration: 100
               }).start();
-      this.___timerMgr.setTimeout(()=>{
+      this.__timerToast2 = this.___timerMgr.setTimeout(()=>{
           foo();
       }, 110);
     } else {
