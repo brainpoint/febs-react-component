@@ -62,13 +62,20 @@ export default class TableViewCell extends Component {
   * @desc 
   */
   render() {
-    return (
-      <TouchableHighlight onPress={this.props.onPress}>
+    if (this.props.onPress)
+      return (
+        <TouchableHighlight onPress={this.props.onPress}>
+          <View style={[styles.tableCell, styles.split]}>
+            {getTitleElement(this.state.left)}{this.state.right}
+          </View>
+        </TouchableHighlight>
+      );
+    else
+      return (
         <View style={[styles.tableCell, styles.split]}>
           {getTitleElement(this.state.left)}{this.state.right}
         </View>
-      </TouchableHighlight>
-    );
+      );
   }
 }
 
