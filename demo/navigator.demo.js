@@ -150,12 +150,17 @@ AppRegistry.registerComponent('app', () => app);
 *   get/set navigationBarHidden :bool
       设置导航栏的状态.
 //-------------
-*   get/set onLeftButtonPress / onRightButtonPress :func
-      当前页面的导航按钮的事件处理函数. 形式为 function(navigator),
-      在其他组件中绑定导航按钮处理事件时,最好在componentWillMount中绑定 
-//-------------
 // (ios only)
 *   get/set interactivePopGestureEnbaled:  PropTypes.bool
       是否允许回退手势.
+
+//-------------
+*   get/set onLeftButtonPress / onRightButtonPress :func
+      当前页面的导航按钮的事件处理函数. 形式为 function(navigator),
+      在其他组件中绑定导航处理事件时,最好在componentWillMount中绑定 
+//-------------
+*   get/set onDidFocus :func
+      当前页面的完成加载后的事件处理函数. 形式为 function(navigator),
+      在其他组件中绑定导航处理事件时,最好在componentWillMount中绑定 
 */
 

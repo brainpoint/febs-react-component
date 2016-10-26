@@ -34,6 +34,20 @@ AppRegistry.registerComponent('app', () => app);
 // @desc: document.
 //----------------------------------------------
 
+
+/*
+//----------------------------------------------
+// @static global style.
+//----------------------------------------------
+*   Page.dotStyle: style
+      非当前页面的样式, 可设置backgroundColor颜色等.
+*   Page.activeDotStyle: style
+      非当前页面的样式, 可设置backgroundColor颜色等.
+*   Page.dot: node
+*   Page.activeDot: node
+      直接使用node节点.
+*/
+
 /*
 //----------------------------------------------
 // @props

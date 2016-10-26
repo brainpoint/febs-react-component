@@ -335,8 +335,8 @@ export default class Page extends Component {
     if(this.state.total <= 1) return null
 
     let dots = []
-    let ActiveDot = this.props.activeDot || <View style={[styles.activeDot,this.activeDotStyle]} />;
-    let Dot = this.props.dot || <View style={[styles.dot,this.dotStyle]} />;
+    let ActiveDot = (this.props.activeDot || Page.activeDot) || <View style={[styles.activeDot,Page.activeDotStyle,this.activeDotStyle]} />;
+    let Dot = (this.props.dot || Page.dot) || <View style={[styles.dot,Page.dotStyle,this.dotStyle]} />;
     for(let i = 0; i < this.state.total; i++) {
       dots.push(i === this.state.index
         ?
@@ -527,6 +527,11 @@ Page.defaultProps = {
   activeDotStyle                   : null,
 };
 
+Page.dotStyle = null;
+Page.activeDotStyle = null;
+Page.dot = null;
+Page.activeDot = null;
+
 /**
 * @desc view style
 */
@@ -546,7 +551,7 @@ const styles = StyleSheet.create({
 
   pagination_x: {
     position: 'absolute',
-    bottom: 25,
+    bottom: 10,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -558,7 +563,7 @@ const styles = StyleSheet.create({
 
   pagination_y: {
     position: 'absolute',
-    right: 15,
+    right: 10,
     top: 0,
     bottom: 0,
     flexDirection: 'column',

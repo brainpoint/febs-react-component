@@ -15,6 +15,8 @@ import {
     UIManager
 } from 'react-native';
 
+import Assign from 'object-assign';
+
 // const padding = 2; //scrollview与外面容器的距离
 const pullOkMargin = 100; //下拉到ok状态时topindicator距离顶部的距离
 const defaultTopIndicatorHeight = 40; //顶部刷新指示器的高度
@@ -35,7 +37,7 @@ export default class extends Component {
         var topIndicatorHeight = this.props.topIndicatorHeight ? this.props.topIndicatorHeight : defaultTopIndicatorHeight;
         this.defaultXY = {x: 0, y: topIndicatorHeight * -1};
         this.pullOkMargin = this.props.pullOkMargin ? this.props.pullOkMargin : pullOkMargin;
-        this.state = Object.assign({}, props, {
+        this.state = Assign({}, props, {
             pullPan: new Animated.ValueXY(this.defaultXY),
             scrollEnabled: this.defaultScrollEnabled,
             height: 0,

@@ -15,7 +15,8 @@ import ReactNative, {
   ScrollView,
   TouchableOpacity,
   Animated,
-  Easing
+  Easing,
+  ActivityIndicator
 } from 'react-native';
 
 import TimerMgr from './timerMgr';
@@ -29,9 +30,13 @@ var g_instance;
 var g_buttonContainerStyle;
 var g_viewStyle;
 var g_toastViewStyle;
+var g_loadingViewStyle;
 var view_width  = 280;
 var view_height = 177;
 var view_btn_height = 44;
+
+var loading_size = 80;
+var loading_size_content = 140;
 
 /**
 * @desc view class
@@ -47,15 +52,26 @@ export default class AlertView extends Component {
       __alertViewHidden:true,
       __toastViewOpacity:new Animated.Value(0),
       __toastViewHidden:true,
+      __loadingViewOpacity:new Animated.Value(0),
+      __loadingViewHidden:true,
     };
-    this.show = this.show.bind(this);
+    this.showAlert = this.showAlert.bind(this);
+    this.isHiddenAlert = this.isHiddenAlert.bind(this);
+    this.hideAlert = this.hideAlert.bind(this);
+    
     this.toast = this.toast.bind(this);
-    this.hide = this.hide.bind(this);
+    
+    this.showLoading = this.showLoading.bind(this);
+    this.isHiddenLoading = this.isHiddenLoading.bind(this);
+    this.hideLoading = this.hideLoading.bind(this);
+
     this.__getContentElement = this.__getContentElement.bind(this);
     this.__getButtonsElement = this.__getButtonsElement.bind(this);
     this.__getAlertViewElement = this.__getAlertViewElement.bind(this);
     this.__getToastContentElement = this.__getToastContentElement.bind(this);
     this.__getToastViewElement = this.__getToastViewElement.bind(this);
+    this.__getLoadingContentElement = this.__getLoadingContentElement.bind(this);
+    this.__getLoadingViewElement = this.__getLoadingViewElement.bind(this);
   }
 
   componentDidMount() {
@@ -72,7 +88,16 @@ export default class AlertView extends Component {
     return (
       <View style={{flex:1}}>
         {this.props.children}
-      
+
+        {/** loading */}
+        {this.state.__loadingViewHidden ? null :
+          (
+            <Animated.View style={{flex:1, opacity:this.state.__loadingViewOpacity,position:'absolute',left:0,top:0, width:screen.width,height:screen.height}}>
+              {this.__getLoadingViewElement()}
+            </Animated.View>
+          )
+        }
+
         {/** alert */}
         {this.state.__alertViewHidden ? null :
           (
@@ -94,7 +119,7 @@ export default class AlertView extends Component {
     );
   }
 
-  show(content, buttonArray, buttonContainerStyle, viewStyle) {
+  showAlert(content, buttonArray, buttonContainerStyle, viewStyle) {
     this._av_content = content;
     this._av_buttonArray = buttonArray;
     this._av_buttonContainerStyle = buttonContainerStyle || g_buttonContainerStyle;
@@ -108,6 +133,44 @@ export default class AlertView extends Component {
             }).start();
   };
 
+  hideAlert() {
+    Animated.timing(this.state.__alertViewOpacity, {
+                toValue: 0,
+                easing: Easing.linear,
+                duration: 150
+            }).start();
+    this.___timerMgr.setTimeout(()=>{this.setState({__alertViewHidden:true});}, 150);
+  }
+
+  isHiddenAlert() {
+    return this.state.__alertViewHidden;
+  }
+
+  showLoading(content, viewStyle) {
+    this._av_content_loading = content;
+    this._av_viewStyle_loading = viewStyle || g_loadingViewStyle;
+
+    this.setState({__loadingViewHidden:false});
+    Animated.timing(this.state.__loadingViewOpacity, {
+                toValue: 1,
+                easing: Easing.linear,
+                duration: 150
+            }).start();
+  };
+
+  hideLoading() {
+    Animated.timing(this.state.__loadingViewOpacity, {
+                toValue: 0,
+                easing: Easing.linear,
+                duration: 150
+            }).start();
+    this.___timerMgr.setTimeout(()=>{this.setState({__loadingViewHidden:true});}, 150);
+  }
+  
+  isHiddenLoading() {
+    return this.state.__loadingViewHidden;
+  }
+
   toast(content, timeoutHide, viewStyle) {
     this._av_content_toast = content;
     this._av_viewStyle_toast = viewStyle || g_toastViewStyle;
@@ -115,7 +178,7 @@ export default class AlertView extends Component {
     this.___timerMgr.clearAll();
 
     const foo = ()=>{
-      // show.
+      // showAlert.
       this.setState({__toastViewHidden:false});
       Animated.timing(this.state.__toastViewOpacity, {
                   toValue: 0.8,
@@ -135,7 +198,7 @@ export default class AlertView extends Component {
       }, (timeoutHide||2000));
     };
 
-    // is show.
+    // is showAlert.
     if (!this.state.__toastViewHidden) {
       Animated.timing(this.state.__toastViewOpacity, {
                   toValue: 0,
@@ -148,19 +211,6 @@ export default class AlertView extends Component {
     } else {
       foo();
     }
-  }
-
-  hide() {
-    Animated.timing(this.state.__alertViewOpacity, {
-                toValue: 0,
-                easing: Easing.linear,
-                duration: 150
-            }).start();
-    this.___timerMgr.setTimeout(()=>{this.setState({__alertViewHidden:true});}, 150);
-  }
-
-  isHidden() {
-    return this.state.__alertViewHidden;
   }
 
   /**
@@ -216,11 +266,12 @@ export default class AlertView extends Component {
       const tintColor   = element.tintColor;
       const tintColors  = tintColor ? {color:tintColor} : null;
       let styc = {};
+      let stycFont = {};
 
       let isDefault = false;
       if (unIsDefault && element.isDefault || btns.length == 1) {
         unIsDefault = false;
-        styc.fontWeight = 600;
+        stycFont.fontWeight = '600';
         isDefault = true;
       }
       
@@ -245,10 +296,10 @@ export default class AlertView extends Component {
       }
 
       let e = (
-        <TouchableOpacity onPress={()=>{element.onPress&&element.onPress(this, i); isDefault&&this.hide();}}>
+        <TouchableOpacity key={i} onPress={()=>{element.onPress&&element.onPress(this, i); isDefault&&this.hideAlert();}}>
         <View style={[styles.buttonOneContainer, styc]}>
           <Text numberOfLines={1} lineBreakMode='tail' 
-            style={[styles.buttonTextContainer, tintColors, sty ]}>
+            style={[styles.buttonTextContainer, tintColors, sty, stycFont ]}>
             {tt}
           </Text>
         </View>
@@ -344,6 +395,55 @@ export default class AlertView extends Component {
       </Animated.View>
     );
   }
+
+  
+  /**
+  * @desc: 
+  * @return: 
+  */
+  __getLoadingContentElement() {
+    const d = this._av_content_loading ? ((!!this._av_content_loading.props)?this._av_content_loading:null) : null;
+    if (d) {
+      return this._av_content_loading;
+    }
+
+    const tt = this._av_content_loading ? this._av_content_loading.text : null;
+    const sty   = this._av_content_loading ? this._av_content_loading.style : null;
+    const tintColor   = this._av_content_loading ? this._av_content_loading.tintColor : null;
+    const tintColors  = tintColor ? {color:tintColor} : {color:'#ffffff'};
+
+    const view_sty = this._av_content_loading ? {width:loading_size_content,height:loading_size_content} : null;
+
+    var t = (<Text numberOfLines={4} lineBreakMode='tail' 
+          style={[styles.contentTextContainer, tintColors, sty ]}>
+          {tt}
+        </Text>);
+
+    return (
+      <View style={[styles.loadingContentContainer, view_sty]}>
+        <ActivityIndicator style={{alignSelf: 'center', color:'#ffffff', marginTop: 10,height: 20}}/>
+        {t}
+      </View>
+    );
+  }
+
+  /**
+  * @desc: 
+  * @return: 
+  */
+  __getLoadingViewElement() {
+    var viewStyle = this._av_viewStyle_loading;
+
+    var sh2 = {bottom:(screen.height)/2 + 30};
+    
+    const view_sty = this._av_content_loading ? {right:(screen.width-loading_size_content)/2, bottom:(screen.height-loading_size_content)/2 + 30, width:loading_size_content,height:loading_size_content} : null;
+
+    return (
+      <View style={[styles.loadingViewContainer, sh2, view_sty, view_sty, viewStyle]}>
+        {this.__getLoadingContentElement()}
+      </View>
+    );
+  }
 }
 
 /**
@@ -368,9 +468,9 @@ const styles = StyleSheet.create({
     height:          view_height,
     backgroundColor: 'rgb(255, 255, 255)',
     borderRadius:    6,
-    borderColor:     '#e2e0e0',
-    borderWidth:     1,
-    zIndex:          1000000
+    // borderColor:     '#e2e0e0',
+    // borderWidth:     1,
+    zIndex:          1000001
   },
   contentContainer: {
     height:          view_height-view_btn_height,
@@ -382,6 +482,7 @@ const styles = StyleSheet.create({
     fontSize:       16, 
     color:          '#000',
     textAlign:      'center',
+    marginTop:      5,
   },
   buttonContainerRow: {
     flexDirection:   'row',
@@ -438,6 +539,28 @@ const styles = StyleSheet.create({
     justifyContent:  'center',
     alignItems:      'center',
   },
+  loadingViewContainer: {
+    flex:            1,
+    position:        'absolute',
+    right:           (screen.width-loading_size)/2,
+    bottom:          (screen.height-loading_size)/2 + 30,
+    flexDirection:   'column',
+    alignItems:      'center',
+    justifyContent:  'flex-start',
+    width:           loading_size,
+    height:          loading_size,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius:    6,
+    // borderColor:     '#e2e0e0',
+    // borderWidth:     1,
+    zIndex:          1000000
+  },
+  loadingContentContainer: {
+    height:          loading_size,
+    width:           loading_size,
+    padding:         10,
+    justifyContent:  'center',
+  },
 });
 
 
@@ -447,23 +570,40 @@ const styles = StyleSheet.create({
 * @param buttonArray: 按钮数组
 * @param buttonContainerStyle: 按钮组的容器样式; 默认样式为 2按钮以下按行排列, 2按钮以上按列排列.
 */
-AlertView.show = function(content, buttonArray, buttonContainerStyle, viewStyle) {
-  g_instance && g_instance.show(content, buttonArray, buttonContainerStyle, viewStyle);
+AlertView.showAlert = function(content, buttonArray, buttonContainerStyle, viewStyle) {
+  g_instance && g_instance.showAlert(content, buttonArray, buttonContainerStyle, viewStyle);
+};
+
+AlertView.hideAlert = function() {
+  g_instance && g_instance.hideAlert();
+}
+
+AlertView.isHiddenAlert = function() {
+  return !g_instance || g_instance.isHiddenAlert();
+}
+
+/**
+* @desc: 显示加载对话框
+* @param content:     显示的内容
+*/
+AlertView.showLoading = function(content, viewStyle) {
+  g_instance && g_instance.showLoading(content, viewStyle);
 };
 
 
-AlertView.hide = function() {
-  g_instance && g_instance.hide();
+AlertView.hideLoading = function() {
+  g_instance && g_instance.hideLoading();
 }
 
-AlertView.isHidden = function() {
-  return !g_instance || g_instance.isHidden();
+AlertView.isHiddenLoading = function() {
+  return !g_instance || g_instance.isHiddenLoading();
 }
 
-AlertView.setDefaultStyle = function(buttonContainerStyle, viewStyle, toastViewStyle) {
-  g_buttonContainerStyle = buttonContainerStyle;
-  g_viewStyle = viewStyle;
-  g_toastViewStyle = toastViewStyle;
+AlertView.setDefaultStyle = function(opt) {
+  g_buttonContainerStyle = opt.buttonContainerStyle;
+  g_viewStyle = opt.viewStyle;
+  g_toastViewStyle = opt.toastViewStyle;
+  g_loadingViewStyle = opt.loadingViewStyle;
 }
 
 AlertView.toast = function(content, timeoutHide, viewStyle) {

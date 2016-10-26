@@ -12,7 +12,6 @@ import ReactNative, {
   View,
   Image,
   Platform,
-  StatusBar,
   TouchableOpacity,
 } from 'react-native';
 
@@ -58,23 +57,6 @@ NavbarButton.defaultProps = {
   tintColor: '#0076FF',
 };
 
-
-/**
-* @desc: status bar
-*/
-function customizeStatusBar(data) {
-  if (Platform.OS === 'ios') {
-    if (data.style) {
-      StatusBar.setBarStyle(data.style);
-    }
-    const animation = data.hidden ?
-    (data.hideAnimation || Navigator.defaultProps.statusBar.hideAnimation) :
-    (data.showAnimation || Navigator.defaultProps.statusBar.showAnimation);
-
-    StatusBar.showHideTransition = animation;
-    StatusBar.hidden = data.hidden;
-  }
-}
 
 function getButtonElement(data, btn, style, textAuto, defaultBarLeftButtonTextAuto, hasBack, onPress) {
   const sty   = (btn?btn.style:null) || (data?data.style:null);
@@ -152,6 +134,7 @@ class Navigator extends Component {
   }
 
   componentWillMount() {
+    
     this.setState({navigationBarHidden:this.props.navigationBarHidden});
     if (Platform.OS == 'android') {
       this._androidListenter = ReactNative.BackAndroid.addEventListener('hardwareBackPress', () => {
@@ -199,6 +182,25 @@ class Navigator extends Component {
   }
   get barTintColor() {
     return (this.state&&this.state.barTintColor)||this.props.defaultBarTintColor||'#ffffff';
+  }
+
+  /**
+  * @desc: 
+  * @return: 
+  */
+  set onDidFocus(c) {
+    var cr = this._getCurRoute();
+    if (cr) {
+      cr.onDidFocus = c;
+      this.setState({});
+    }
+  }
+  get onDidFocus() {
+    var cr = this._getCurRoute();
+    if (cr) {
+      return cr.onDidFocus;
+    }
+    return null;
   }
 
   /**
@@ -404,6 +406,9 @@ class Navigator extends Component {
           this._willNavHidden = this._getCurNavHidden(route);
           if (this._willNavHidden != this._getCurNavHidden()) {this.setState({});}
         }}
+        onDidFocus = {(route)=> {
+          route.onDidFocus && route.onDidFocus(this.refs.nav);
+        }}
       />
     );
   }
@@ -426,18 +431,8 @@ const TitleShape = {
   style: PropTypes.object,
 };
 
-const StatusBarShape = {
-  style: PropTypes.oneOf(['light-content', 'default', ]),
-  hidden: PropTypes.bool,
-  tintColor: PropTypes.string,
-  hideAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ]),
-  showAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ])
-};
-
-
 Navigator.SceneConfigs = ReactNative.Navigator.SceneConfigs;
 Navigator.propTypes = {
-  statusBar: PropTypes.shape(StatusBarShape),
   navigationBarHidden: PropTypes.bool,
   defaultBarTintColor: PropTypes.string,
   defaultBarLeftButton: PropTypes.oneOfType([
@@ -455,12 +450,6 @@ Navigator.propTypes = {
   };
 
 Navigator.defaultProps = {
-  statusBar: {
-    style: 'default',
-    hidden: (Platform.OS == 'web' ? true : false),
-    hideAnimation: 'slide',
-    showAnimation: 'slide',
-  },
   navigationBarHidden: false,
   defaultBarTitle: {
     text: '',

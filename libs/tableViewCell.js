@@ -46,6 +46,10 @@ export default class TableViewCell extends Component {
     this.setState({left: this.props.left, right: this.props.right});  
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({left: nextProps.left, right: nextProps.right});  
+  }
+
   /**
   * @desc:
   */

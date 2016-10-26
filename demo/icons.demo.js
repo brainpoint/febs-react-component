@@ -8,6 +8,14 @@
 // @desc: demo.
 //----------------------------------------------
 
+import {
+  Icons
+} from '../component';
+
+function render() {
+  return (Icons.getIconArrowLeft());
+}
+
 //----------------------------------------------
 // @desc: document.
 //----------------------------------------------

@@ -81,7 +81,9 @@ function getIconClose(style=null) {
 
 
 function getIconCloseCircle(style=null) {
-  return (<Image source={{uri:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAANpJREFUKBV90E0LAVEUxvFJhJ23CF9DtrNQNkpRxEJNpixsLH0fSykrkqW1xAax8xW8LWf+Z3I1xjS3fjP3nvOc5kWzLGsDQwtY9ONYwtS41PBGz2+GegxrbJFwMmzqkKGue4hzFCvskHT35ElNyFBLGtwlLK+xR+onrA402pChDhY4IK36vncCBmRdkfGGQu4CgQjnBm4oogz/JWHMcUQWfbxQ/ZugGMYMJ+RUgP0AT1RUTf6GhKc4I/9tfDbUhnhAd0psJrig4A2rM70R7ijJE8aQDwxcZEzoNiwj7FzGBTCyAAAAAElFTkSuQmCC'}} style={[{width:12, height:12}, style]}/>);
+  var img = require('../images/closeCircle.js');
+  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 
