@@ -121,7 +121,7 @@ export default class AlertView extends Component {
 
   showAlert(content, buttonArray, buttonContainerStyle, viewStyle) {
     this._av_content = content;
-    this._av_buttonArray = buttonArray;
+    this._av_buttonArray = buttonArray || [{text:'ok'}];
     this._av_buttonContainerStyle = buttonContainerStyle || g_buttonContainerStyle;
     this._av_viewStyle = viewStyle || g_viewStyle;
 
