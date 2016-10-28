@@ -422,12 +422,12 @@ export default class AlertView extends Component {
 
     return (
       <View style={[styles.loadingContentContainer, view_sty]}>
-        <ActivityIndicator style={{alignSelf: 'center', color:'#ffffff', marginTop: 10,height: 20}}/>
+        <ActivityIndicator color="white" style={{alignSelf: 'center', marginTop: 10,height: 20}}/>
         {t}
       </View>
     );
   }
-
+ 
   /**
   * @desc: 
   * @return: 
