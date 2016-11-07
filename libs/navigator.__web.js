@@ -15,15 +15,20 @@ import ReactNative, {
   TouchableOpacity,
 } from 'react-native';
 
+import deepEqual from 'deep-equal';
 import path from 'path';
-import { match } from 'react-router';
+import { Router, Route, match, browserHistory } from 'react-router';
 
 import {styles, NAV_BAR_HEIGHT, STATUS_BAR_HEIGHT} from './navigator.style';
 import {getIconArrowLeft} from './icons';
+
 var NaviRN = ReactNative.Navigator;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+let history = browserHistory;
+let historyProxy = {};
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; if (!source) continue; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _destIndex = 0;
 
 /**
 * @desc: NavbarButton
@@ -124,7 +129,7 @@ function getTitleElement(data, barTitle) {
 // @desc: Router  
 //--------------------------------------------------------
 function getRouteInfos(obj, rootPath) {
-    let pp = rootPath?path.join(rootPath, obj.props.path):obj.props.path;
+    let pp = obj.props.path == '*' ? obj.props.path : (rootPath?path.join(rootPath, obj.props.path):obj.props.path);
     let o = { 
       path:pp, 
       component:obj.props.component,
@@ -149,34 +154,57 @@ function getRouteInfos(obj, rootPath) {
     return o;
 }
 
-export class Route extends Component {
-}
+let routerProps = {};
+
+
+class EmptyView extends Component {}
+
 
 //--------------------------------------------------------
-// @desc: navigator 
+// @desc: navigator; 
 //--------------------------------------------------------
 class Navigator extends Component {
   //this._willNavHidden;
   constructor(props) {
+    // super(routerProps);
+    // this._props = routerProps;
+    // NavigatorRouter.Instance = this;
     super(props);
+    this._props = props;
     this._getNavBarRender = this._getNavBarRender.bind(this);
     this._getCurNavHidden = this._getCurNavHidden.bind(this);
     this._getCurRoute = this._getCurRoute.bind(this);
 
-    this._routes = getRouteInfos(this.props.children);
+    this._routes = getRouteInfos(this._props.children);
+
+    // fix history.push error.
+    if (window.location.protocol == 'file:') {
+      historyProxy = {
+        getCurrentLocation: history.getCurrentLocation,
+        push: ()=>{},
+        listen: ()=>{},
+        goBack: ()=>{}
+      };
+    } else {
+      historyProxy = history;
+    }
 
     // get initialRoute
     let ctx = this;
-    match({location:'/', routes:this._routes}, (err, redirectLocation, renderProps)=>{
+    let location = historyProxy.getCurrentLocation();
+    let curPath = location.pathname;
+    match({location:curPath, routes:this._routes}, (err, redirectLocation, renderProps)=>{
       if (renderProps)
       {
         ctx._initialRoute = renderProps.routes.length > 0 ? renderProps.routes[renderProps.routes.length-1] : null;
-        ctx._initialRoute = _extends({}, ctx._initialRoute, {params:renderProps.params}); 
+        ctx._initialRoute = _extends({}, ctx._initialRoute, {params:renderProps.params, query:location.query, path:curPath}); 
       }
     });
-
+    // get react-router routes.
+    
     this._bindMethod(this);
   }
+
 
   _bindMethod(ctx) {
     Object.defineProperty(Navigator,"navigationBarHeight", {
@@ -213,13 +241,25 @@ class Navigator extends Component {
   }
 
   componentDidMount() {
-    // this.push(this.props.initialRoute);
-    // this.setState({navigationBarHidden:this.props.navigationBarHidden});
+    // this.push(this._props.initialRoute);
+    // this.setState({navigationBarHidden:this._props.navigationBarHidden});
+    let ctx = this;
+
+    this._unlisten = historyProxy.listen(function(location) {      
+      let curRoute = ctx._getCurRoute();
+      if (ctx._isDiffRouteAndLocation(curRoute.path)) {
+        let route = ctx._getRouteByPath(location.pathname+location.search);
+        if (route) {
+          ctx.popToRoute(location.pathname+location.search);
+        } else {
+          ctx.resetTo(location.pathname+location.search);
+        }
+      }
+    }.bind(this));
   }
 
   componentWillMount() {
-    
-    this.setState({navigationBarHidden:this.props.navigationBarHidden});
+    this.setState({navigationBarHidden:this._props.navigationBarHidden});
     if (Platform.OS == 'android') {
       this._androidListenter = ReactNative.BackAndroid.addEventListener('hardwareBackPress', () => {
         if (this.refs.nav && this.refs.nav.getCurrentRoutes().length > 1) {
@@ -235,6 +275,8 @@ class Navigator extends Component {
   }
 
   componentWillUnmount() {
+    this._unlisten();
+
     if (Platform.OS == 'android') {
       this._androidListenter.remove();
     }
@@ -269,7 +311,7 @@ class Navigator extends Component {
     this.setState({barTintColor:c});
   }
   get barTintColor() {
-    return (this.state&&this.state.barTintColor)||(this.props&&this.props.defaultBarTintColor)||'#ffffff';
+    return (this.state&&this.state.barTintColor)||(this._props&&this._props.defaultBarTintColor)||'#ffffff';
   }
 
   /**
@@ -333,70 +375,97 @@ class Navigator extends Component {
   /**
   * @desc: push 
   */
-  push(path, props) {
+  push(apath, props) {
     let barHide = this._getCurNavHidden();
 
     // get Route
     let ctx = this;
-    match({location:path, routes:this._routes}, (err, redirectLocation, renderProps)=>{
+    match({location:apath, routes:this._routes}, (err, redirectLocation, renderProps)=>{
       if (renderProps)
       {
         if (renderProps.routes.length > 0)
         {
-          let rout = renderProps.routes[renderProps.routes.length-1];
-          if (props) {
-            rout = _extends({}, rout, props, {params:renderProps.params});
-          }
-          ctx.refs.nav.push(rout);
-          if (ctx._getCurNavHidden(rout) != barHide) {
-            ctx.setState({});
+          if (this._isDiffRouteAndLocation(apath)) {
+            let rout = renderProps.routes[renderProps.routes.length-1];
+            rout = _extends({}, rout, props, {params:renderProps.params, query:renderProps.location.query, path:apath});
+                      
+            let route = ctx._getRouteByPath(apath);
+            if (route) {
+              _extends(route, rout);
+            } else {
+              route = rout;
+            }
+            
+            ctx.refs.nav.push(route, ()=>{
+                historyProxy.push(apath);
+            });
+            if (ctx._getCurNavHidden(route) != barHide) {
+              ctx.setState({});
+            }
           }
         }
       }
-    });    
+    });
   }
 
   /**
    * @desc: replace
    */
-  replace(path, props)          { 
+  replace(apath, props)          { 
     let barHide = this._getCurNavHidden();
 
     // get Route
     let ctx = this;
-    match({location:path, routes:this._routes}, (err, redirectLocation, renderProps)=>{
+
+    match({location:apath, routes:this._routes}, (err, redirectLocation, renderProps)=>{
       if (renderProps)
       {
         if (renderProps.routes.length > 0)
         {
-          let rout = renderProps.routes[renderProps.routes.length-1];
-          if (props) {
-            rout = _extends({}, rout, props, {params:renderProps.params});
-          }
-          ctx.refs.nav.replace(rout);
-          if (ctx._getCurNavHidden(rout) != barHide) {
-            ctx.setState({});
+          if (this._isDiffRouteAndLocation(apath)) {
+            let rout = renderProps.routes[renderProps.routes.length-1];
+            rout = _extends({}, rout, props, {params:renderProps.params, query:renderProps.location.query, path:apath});
+              
+            let route = ctx._getRouteByPath(apath);
+            if (route) {
+              _extends(route, rout);
+            } else {
+              route = rout;
+            }
+
+            ctx.refs.nav.replace(route, ()=>{
+                historyProxy.push(apath);
+            });
+            if (ctx._getCurNavHidden(route) != barHide) {
+              ctx.setState({});
+            }
           }
         }
       }
     });    
   }
-  replacePrevious(path, props)  {
+  replacePrevious(apath, props)  {
     let barHide = this._getCurNavHidden();
     
     // get Route
     let ctx = this;
-    match({location:path, routes:this._routes}, (err, redirectLocation, renderProps)=>{
+    match({location:apath, routes:this._routes}, (err, redirectLocation, renderProps)=>{
       if (renderProps)
       {
         if (renderProps.routes.length > 0)
         {
           let rout = renderProps.routes[renderProps.routes.length-1];
-          if (props) {
-            rout = _extends({}, rout, props, {params:renderProps.params});
+          rout = _extends({}, rout, props, {params:renderProps.params, query:renderProps.location.query, path:apath});
+                              
+          let route = ctx._getRouteByPath(apath);
+          if (route) {
+            _extends(route, rout);
+          } else {
+            route = rout;
           }
-          ctx.refs.nav.replacePrevious(rout);
-          if (ctx._getCurNavHidden(rout) != barHide) {
+
+          ctx.refs.nav.replacePrevious(route);
+          if (ctx._getCurNavHidden(route) != barHide) {
             ctx.setState({});
           }
         }
@@ -409,34 +478,135 @@ class Navigator extends Component {
   */
   pop()             {
     let barHide = this._getCurNavHidden();
-    this.refs.nav.pop();
-    if (this._getCurNavHidden() != barHide) {
-      this.setState({});
-    }
+    let routes = this.refs.nav.getCurrentRoutes();
+    if (routes.length > 1) {
+      this.refs.nav.pop(()=>{
+        historyProxy.goBack();
+      });
+      if (this._getCurNavHidden() != barHide) {
+        this.setState({});
+      }
+    } else {
+      let curRoute = this._getCurRoute();
+      let ctx = this;
+      match({location:curRoute.path, routes:this._routes}, (err, redirectLocation, renderProps)=>{
+        if (renderProps)
+        {
+          if (renderProps.routes.length > 1)
+          {
+            let rout = renderProps.routes[renderProps.routes.length-2];
+            rout = _extends({}, rout, {params:renderProps.params, query:renderProps.location.query}); 
+
+            ctx.refs.nav.pushRouteToFront(rout, ()=>{
+              ctx.refs.nav.pop(()=>{
+                  historyProxy.push(rout.path);
+              });
+              if (ctx._getCurNavHidden() != barHide) {
+                ctx.setState({});
+              }
+            });
+          }
+        }
+      });
+    } // if..else
   }
+
   popToTop()        { 
     let barHide = this._getCurNavHidden();
-    this.refs.nav.popToTop();
-    if (this._getCurNavHidden() != barHide) {
-      this.setState({});
+
+    if (!this._routeIsExist('/')) {
+      let ctx = this;
+      match({location:'/', routes:this._routes}, (err, redirectLocation, renderProps)=>{
+        if (renderProps)
+        {
+          let route = renderProps.routes.length > 0 ? renderProps.routes[0] : null;
+          route = _extends({}, route, {params:renderProps.params, query:renderProps.location.query, path:'/'}); 
+          ctx.refs.nav.pushRouteToFront(route, ()=>{
+            ctx.refs.nav.popToTop(()=>{
+                historyProxy.push('/');
+            });
+            if (ctx._getCurNavHidden() != barHide) {
+              ctx.setState({});
+            }
+          });
+        }
+      });
+    }
+    else {
+      this.refs.nav.popToTop(()=>{
+        historyProxy.push('/');
+      });      
+      if (this._getCurNavHidden() != barHide) {
+        this.setState({});
+      }
     }
   }
-  popToRoute(path, props) { 
+  popToRoute(apath, props) { 
     let barHide = this._getCurNavHidden();
-        
+
+    let route = this._getRouteByPath(apath);
+    if (route) {
+      this.refs.nav.popToRoute(route, ()=>{
+        historyProxy.push(route.path);
+      });
+      if (this._getCurNavHidden(route) != barHide) {
+        this.setState({});
+      }
+    }
+    else 
+    {
+      // get Route
+      let ctx = this;
+      match({location:apath, routes:this._routes}, (err, redirectLocation, renderProps)=>{
+        if (renderProps)
+        {
+          if (renderProps.routes.length > 0)
+          {
+            let rout = renderProps.routes[renderProps.routes.length-1];
+            rout = _extends({}, rout, props, {params:renderProps.params, query:renderProps.location.query, path:apath});
+                                
+            let route = ctx._getRouteByPath(apath);
+            if (route) {
+              _extends(route, rout);
+            } else {
+              route = rout;
+            }
+
+            ctx.refs.nav.popToRoute(route, ()=>{
+              historyProxy.push(apath);
+            });
+            if (ctx._getCurNavHidden(route) != barHide) {
+              ctx.setState({});
+            }
+          }
+        }
+      });
+    }
+  }
+
+  resetTo(apath, props)    { 
+    let barHide = this._getCurNavHidden();
+            
     // get Route
     let ctx = this;
-    match({location:path, routes:this._routes}, (err, redirectLocation, renderProps)=>{
+    match({location:apath, routes:this._routes}, (err, redirectLocation, renderProps)=>{
       if (renderProps)
       {
         if (renderProps.routes.length > 0)
         {
           let rout = renderProps.routes[renderProps.routes.length-1];
-          if (props) {
-            rout = _extends({}, rout, props, {params:renderProps.params});
+          rout = _extends({}, rout, props, {params:renderProps.params, query:renderProps.location.query, path:apath});
+                              
+          let route = ctx._getRouteByPath(apath);
+          if (route) {
+            _extends(route, rout);
+          } else {
+            route = rout;
           }
-          ctx.refs.nav.popToRoute(rout);
-          if (ctx._getCurNavHidden(rout) != barHide) {
+
+          ctx.refs.nav.resetTo(route);
+          historyProxy.push(apath);
+          if (ctx._getCurNavHidden(route) != barHide) {
             ctx.setState({});
           }
         }
@@ -444,27 +614,28 @@ class Navigator extends Component {
     });
   }
 
-  resetTo(path, props)    { 
-    let barHide = this._getCurNavHidden();
-            
-    // get Route
-    let ctx = this;
-    match({location:path, routes:this._routes}, (err, redirectLocation, renderProps)=>{
-      if (renderProps)
-      {
-        if (renderProps.routes.length > 0)
-        {
-          let rout = renderProps.routes[renderProps.routes.length-1];
-          if (props) {
-            rout = _extends({}, rout, props, {params:renderProps.params});
-          }
-          ctx.refs.nav.resetTo(rout);
-          if (ctx._getCurNavHidden(rout) != barHide) {
-            ctx.setState({});
-          }
-        }
+  _routeIsExist(apath) {
+    if (this.refs && this.refs.nav)
+    {
+      let routes = this.refs.nav.getCurrentRoutes();
+      for (let i = 0; i < routes.length; i++) {
+        if (routes[i].path == apath)
+          return true;
       }
-    });
+    }
+    return false;
+  }
+
+  _getRouteByPath(apath) {
+    if (this.refs && this.refs.nav)
+    {
+      let routes = this.refs.nav.getCurrentRoutes();
+      for (let i = 0; i < routes.length; i++) {
+        if (routes[i].path == apath)
+          return routes[i];
+      }
+    }
+    return null;
   }
 
   _getCurRoute(curRoute) {
@@ -478,7 +649,7 @@ class Navigator extends Component {
       }
       return route;
     }
-    return null;
+    return this._initialRoute;
   }
   
   _getCurNavHidden(curRoute=null) {
@@ -505,11 +676,11 @@ class Navigator extends Component {
     const bar = (has === true) ? null : (
           <NaviRN.NavigationBar
             routeMapper={{
-              Title:       (route, navigator, index, navState) => { return getTitleElement(this.props.defaultBarTitle, route.barTitle); },
+              Title:       (route, navigator, index, navState) => { return getTitleElement(this._props.defaultBarTitle, route.barTitle); },
               LeftButton:  (route, navigator, index, navState) => {
                 let text;
                 let hasBack = false;  
-                if (this.props.defaultBarLeftButtonTextAuto)
+                if (this._props.defaultBarLeftButtonTextAuto)
                 {
                   let routes = navigator.getCurrentRoutes();
                   let ii = routes.indexOf(route);
@@ -527,27 +698,27 @@ class Navigator extends Component {
                                     btn
                                     ?(
                                       btn.onPress ||
-                                       (
-                                          this.props.defaultBarLeftButton&&this.props.defaultBarLeftButton.onPress 
-                                            ? this.props.defaultBarLeftButton.onPress 
+                                      (
+                                          this._props.defaultBarLeftButton&&this._props.defaultBarLeftButton.onPress 
+                                            ? this._props.defaultBarLeftButton.onPress 
                                             : ((navi)=>this.pop())
-                                       )
-                                     )
+                                      )
+                                    )
                                     :((navi)=>this.pop())
                                   );                
-                return getButtonElement(this.props.defaultBarLeftButton, route.barLeftButton, {marginLeft:8}, text, this.props.defaultBarLeftButtonTextAuto, hasBack, onPress); 
+                return getButtonElement(this._props.defaultBarLeftButton, route.barLeftButton, {marginLeft:8}, text, this._props.defaultBarLeftButtonTextAuto, hasBack, onPress); 
               },
               RightButton: (route, navigator, index, navState) => {
                 const btn = route.barRightButton;
                 let onPress     = route.onRightButtonPress ||
-                                   (btn?btn.onPress:
+                                  (btn?btn.onPress:
                                       (
-                                        this.props.defaultBarRightButton&&this.props.defaultBarRightButton.onPress 
-                                        ? this.props.defaultBarRightButton.onPress 
+                                        this._props.defaultBarRightButton&&this._props.defaultBarRightButton.onPress 
+                                        ? this._props.defaultBarRightButton.onPress 
                                         : null
                                       )
-                                     );   
-                return getButtonElement(this.props.defaultBarRightButton, route.barRightButton, {marginRight:8}, null, null, null, onPress); 
+                                    );   
+                return getButtonElement(this._props.defaultBarRightButton, route.barRightButton, {marginRight:8}, null, null, null, onPress); 
               },
             }}
             style={[styles.debug, styles.navBar, {backgroundColor: this.barTintColor}, {zIndex:1}, styles.split]}
@@ -557,6 +728,31 @@ class Navigator extends Component {
     return bar;
   }
 
+  _isDiffRouteAndLocation(apath) {
+    let location = historyProxy.getCurrentLocation();
+    let i = apath.indexOf('?');
+    let pathname = apath;
+    let query;
+    if (i > 0) {
+      pathname = apath.substring(0, i);
+      let querystr = apath.substring(i+1);
+      querystr = querystr.split('&');
+      query = {};
+      querystr.forEach(function(e) {
+        let ee = e.split('=');
+        query[ee[0]] = ee[1];
+      });
+    }
+
+    if ((query && !deepEqual(query, location.query))
+      || (location.pathname != pathname && !(pathname == '/' && location.pathname == '')))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
   render() {
     const contentOffset = ((this._willNavHidden===true||this._willNavHidden===false) ? this._willNavHidden : this._getCurNavHidden()) 
                           ? null : {marginTop: ((Platform.OS == 'ios') ? NAV_BAR_HEIGHT+STATUS_BAR_HEIGHT : NAV_BAR_HEIGHT) };
@@ -564,7 +760,7 @@ class Navigator extends Component {
     return (
       <NaviRN
         ref = 'nav'
-        configureScene = {(route, routeStack) => { return (route.configureScene?route.configureScene:this.props.configureScene); } }
+        configureScene = {(route, routeStack) => { return (route.configureScene?route.configureScene:this._props.configureScene); } }
         navigationBar = {this._getNavBarRender()}
         renderScene = {(route, navigator) => {
           if (!route.component)
@@ -583,7 +779,54 @@ class Navigator extends Component {
       />
     );
   }
-} // class Navigator.
+}; // class Navigator.
+
+
+// function getReactRouterRoutes(obj, rootPath) {
+//   let apath = obj.props.path;
+//   let children = null;
+
+//   if (obj.props.children) {
+//     if (obj.props.children instanceof Array)
+//     {
+//       children = [];
+//       obj.props.children.forEach(function(element) {
+//         children.push(getReactRouterRoutes(element, true));
+//       });
+//     }
+//     else
+//     {
+//       children = getReactRouterRoutes(obj.props.children, true)
+//     }
+//   }
+
+//   return (
+//     <Route path={apath} component={rootPath ? EmptyView : Navigator}>
+//       {children}
+//     </Route>
+//   );
+// }
+
+
+// class NavigatorRouter extends Component {
+//   //this._willNavHidden;
+//   constructor(props) {
+//     super(props);
+//     routerProps = props;
+
+//     // get react-router routes.
+//     this._config = getReactRouterRoutes(this.props.children);
+//   }
+
+//   render() {
+//     return (
+//         <Router history={browserHistory}>
+//           {this._config}
+//         </Router>
+//       );
+//   }
+// }
+//NavigatorRouter.SceneConfigs = ReactNative.Navigator.SceneConfigs;
 
 /**
 * @desc: 
@@ -603,6 +846,7 @@ const TitleShape = {
 };
 
 Navigator.SceneConfigs = ReactNative.Navigator.SceneConfigs;
+
 Navigator.propTypes = {
   navigationBarHidden: PropTypes.bool,
   defaultBarTintColor: PropTypes.string,
@@ -629,5 +873,6 @@ Navigator.defaultProps = {
   configureScene: Navigator.SceneConfigs.FloatFromRight
 };
 
-//AppRegistry.registerComponent('', () => );
+
+exports.Route = Route;
 module.exports = Navigator;

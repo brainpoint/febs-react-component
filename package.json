@@ -1,6 +1,6 @@
 {
   "name": "citong-react-component",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "license": "BSD-3-Clause",
   "homepage": "https://github.com/brainpoint/citong-react-component#readme",
   "repository": {
@@ -14,7 +14,9 @@
     "citong-react-component"
   ],
   "peerDependencies": {
+    "deep-equal": "^1.0.1",
     "react": "^15.1",
-    "react-dom": "^15.1"
+    "react-dom": "^15.1",
+    "react-router": "^3.0.0"
   }
 }

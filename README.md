@@ -39,6 +39,7 @@ see demo.
 
 #### Components
 * AlertView
+* Button
 * Icons
 * Navigator
 * Page

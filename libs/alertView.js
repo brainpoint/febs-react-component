@@ -469,8 +469,8 @@ const styles = StyleSheet.create({
     height:          view_height,
     backgroundColor: 'rgb(255, 255, 255)',
     borderRadius:    6,
-    // borderColor:     '#e2e0e0',
-    // borderWidth:     1,
+    borderColor:     '#eeeeee',
+    borderWidth:     1,
     zIndex:          1000001
   },
   contentContainer: {
@@ -552,8 +552,8 @@ const styles = StyleSheet.create({
     height:          loading_size,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius:    6,
-    // borderColor:     '#e2e0e0',
-    // borderWidth:     1,
+    borderColor:     '#eeeeee',
+    borderWidth:     1,
     zIndex:          1000000
   },
   loadingContentContainer: {

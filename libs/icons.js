@@ -7,58 +7,45 @@
 import React,{ Component, PropTypes }        from 'react';
 import {
   Image,
-  PixelRatio
 } from 'react-native';
-
-const imageName = ((PixelRatio.get() <= 1) 
-                  ? ''
-                  : ((PixelRatio.get() <= 2) ? '@2x' : '@3x')); 
 
 function getIconArrowLeft(style=null) {
   var img = require('../images/arrowLeft');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:13, height:22}, style]}/>);
 }
 
 function getIconCross(style=null) {
-  var img = require('../images/cross');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  var img = require('../images/cross'); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 function getIconSearch(style=null) {
-  var img = require('../images/search');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  var img = require('../images/search'); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 function getIconChecked(style=null) {
-  var img = require('../images/checked.js');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  var img = require('../images/checked.js'); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 function getIconUnCheck(style=null) {
-  var img = require('../images/uncheck.js');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  var img = require('../images/uncheck.js'); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 function getIconEdit(style=null) {
-  var img = require('../images/edit.js');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
+  var img = require('../images/edit.js'); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 function getIconDelete(style=null) {
   var img = require('../images/delete.js');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
 function getIconRight(style=null) {
   var img = require('../images/right.js');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 
@@ -82,7 +69,6 @@ function getIconClose(style=null) {
 
 function getIconCloseCircle(style=null) {
   var img = require('../images/closeCircle.js');
-  img = ((PixelRatio.get() <= 1) ? img._1 : ((PixelRatio.get() <= 2) ? img._2 : img._3)); 
   return (<Image source={{uri:img}} style={[{alignSelf:'center', width:18, height:18}, style]}/>);
 }
 

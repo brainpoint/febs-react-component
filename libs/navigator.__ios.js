@@ -37,8 +37,43 @@ class Navigator extends Component {
 
   constructor(props) {
     super(props);
-    Navigator.Instance = this;
     this.getNavRoute = this.getNavRoute.bind(this);
+
+    this._bindMethod(this);
+  }
+
+  _bindMethod(ctx) {
+    Object.defineProperty(Navigator,"navigationBarHeight", {
+      get: function () {return ctx.navigationBarHeight;},
+      set: function (x) { ctx.navigationBarHeight = x; } 
+    });
+    Object.defineProperty(Navigator,"navigationBarHidden", {
+      get: function () {return ctx.navigationBarHidden;},
+      set: function (x) { ctx.navigationBarHidden = x; } 
+    });
+    Object.defineProperty(Navigator,"barTintColor", {
+      get: function () {return ctx.barTintColor;},
+      set: function (x) { ctx.barTintColor = x; } 
+    });
+    Object.defineProperty(Navigator,"onDidFocus", {
+      get: function () {return ctx.onDidFocus;},
+      set: function (x) { ctx.onDidFocus = x; } 
+    });
+    Object.defineProperty(Navigator,"onLeftButtonPress", {
+      get: function () {return ctx.onLeftButtonPress;},
+      set: function (x) { ctx.onLeftButtonPress = x; } 
+    });
+    Object.defineProperty(Navigator,"onRightButtonPress", {
+      get: function () {return ctx.onRightButtonPress;},
+      set: function (x) { ctx.onRightButtonPress = x; } 
+    });
+    Navigator.push              = ctx.push.bind(ctx);
+    Navigator.replace           = ctx.replace.bind(ctx);
+    Navigator.replacePrevious   = ctx.replacePrevious.bind(ctx);
+    Navigator.pop               = ctx.pop.bind(ctx);
+    Navigator.popToTop          = ctx.popToTop.bind(ctx);
+    Navigator.popToRoute        = ctx.popToRoute.bind(ctx);
+    Navigator.resetTo           = ctx.resetTo.bind(ctx);
   }
 
   componentDidMount() {

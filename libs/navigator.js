@@ -9,8 +9,11 @@ import {
   Platform
 } from 'react-native';
 
-// module.exports = ((Platform.OS == 'web') 
-//                   ? require('./navigator.__android') 
-//                   : ((Platform.OS == 'android') ? require('./navigator.__android') : require('./navigator.__android') )); 
-
-module.exports = require('./navigator.__android');
+module.exports = ((Platform.OS == 'web') 
+                  ? require('./navigator.__web') 
+                  : (
+                      (Platform.OS == 'android') 
+                      ? require('./navigator.__android') 
+                      : require('./navigator.__android') 
+                    )
+                  ); 

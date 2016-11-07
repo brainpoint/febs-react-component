@@ -5,6 +5,7 @@
 */
 
 import AlertView           from './libs/alertView';
+import Button              from './libs/button';
 import Icons               from './libs/icons';
 import Navigator           from './libs/navigator';
 import Page                from './libs/page';
@@ -15,6 +16,7 @@ import TimerMgr            from './libs/timerMgr';
 
 exports.AlertView           = AlertView;
 exports.Icons               = Icons;
+exports.Button              = Button;
 exports.Navigator           = Navigator;
 exports.Page                = Page;
 exports.RefreshListView     = RefreshListView;
