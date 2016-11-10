@@ -159,11 +159,12 @@ class Navigator extends Component {
   //this._willNavHidden;
   constructor(props) {
     super(props);
+    this._props = props;
     this._getNavBarRender = this._getNavBarRender.bind(this);
     this._getCurNavHidden = this._getCurNavHidden.bind(this);
     this._getCurRoute = this._getCurRoute.bind(this);
 
-    this._routes = getRouteInfos(this.props.children);
+    this._routes = getRouteInfos(this._props.children);
 
     // get initialRoute
     let ctx = this;
@@ -219,7 +220,7 @@ class Navigator extends Component {
 
   componentWillMount() {
     
-    this.setState({navigationBarHidden:this.props.navigationBarHidden});
+    this.setState({navigationBarHidden:this._props.navigationBarHidden});
     if (Platform.OS == 'android') {
       this._androidListenter = ReactNative.BackAndroid.addEventListener('hardwareBackPress', () => {
         if (this.refs.nav && this.refs.nav.getCurrentRoutes().length > 1) {
@@ -269,7 +270,7 @@ class Navigator extends Component {
     this.setState({barTintColor:c});
   }
   get barTintColor() {
-    return (this.state&&this.state.barTintColor)||(this.props&&this.props.defaultBarTintColor)||'#ffffff';
+    return (this.state&&this.state.barTintColor)||(this._props&&this._props.defaultBarTintColor)||'#ffffff';
   }
 
   /**
@@ -509,7 +510,7 @@ class Navigator extends Component {
               LeftButton:  (route, navigator, index, navState) => {
                 let text;
                 let hasBack = false;  
-                if (this.props.defaultBarLeftButtonTextAuto)
+                if (this._props.defaultBarLeftButtonTextAuto)
                 {
                   let routes = navigator.getCurrentRoutes();
                   let ii = routes.indexOf(route);
@@ -528,26 +529,26 @@ class Navigator extends Component {
                                     ?(
                                       btn.onPress ||
                                        (
-                                          this.props.defaultBarLeftButton&&this.props.defaultBarLeftButton.onPress 
-                                            ? this.props.defaultBarLeftButton.onPress 
+                                          this._props.defaultBarLeftButton&&this._props.defaultBarLeftButton.onPress 
+                                            ? this._props.defaultBarLeftButton.onPress 
                                             : ((navi)=>this.pop())
                                        )
                                      )
                                     :((navi)=>this.pop())
                                   );                
-                return getButtonElement(this.props.defaultBarLeftButton, route.barLeftButton, {marginLeft:8}, text, this.props.defaultBarLeftButtonTextAuto, hasBack, onPress); 
+                return getButtonElement(this._props.defaultBarLeftButton, route.barLeftButton, {marginLeft:8}, text, this.props.defaultBarLeftButtonTextAuto, hasBack, onPress); 
               },
               RightButton: (route, navigator, index, navState) => {
                 const btn = route.barRightButton;
                 let onPress     = route.onRightButtonPress ||
                                    (btn?btn.onPress:
                                       (
-                                        this.props.defaultBarRightButton&&this.props.defaultBarRightButton.onPress 
-                                        ? this.props.defaultBarRightButton.onPress 
+                                        this._props.defaultBarRightButton&&this._props.defaultBarRightButton.onPress 
+                                        ? this._props.defaultBarRightButton.onPress 
                                         : null
                                       )
                                      );   
-                return getButtonElement(this.props.defaultBarRightButton, route.barRightButton, {marginRight:8}, null, null, null, onPress); 
+                return getButtonElement(this._props.defaultBarRightButton, route.barRightButton, {marginRight:8}, null, null, null, onPress); 
               },
             }}
             style={[styles.debug, styles.navBar, {backgroundColor: this.barTintColor}, {zIndex:1}, styles.split]}
@@ -564,7 +565,7 @@ class Navigator extends Component {
     return (
       <NaviRN
         ref = 'nav'
-        configureScene = {(route, routeStack) => { return (route.configureScene?route.configureScene:this.props.configureScene); } }
+        configureScene = {(route, routeStack) => { return (route.configureScene?route.configureScene:this._props.configureScene); } }
         navigationBar = {this._getNavBarRender()}
         renderScene = {(route, navigator) => {
           if (!route.component)
