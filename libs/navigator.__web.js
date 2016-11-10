@@ -241,10 +241,12 @@ class Navigator extends Component {
   }
 
   componentDidMount() {
-    // this.push(this._props.initialRoute);
-    // this.setState({navigationBarHidden:this._props.navigationBarHidden});
     let ctx = this;
 
+    if (this.__willPushPage) {
+      this.resetTo(this.__willPushPage.path, this.__willPushPage);
+    }
+    
     this._unlisten = historyProxy.listen(function(location) {      
       let curRoute = ctx._getCurRoute();
       if (ctx._isDiffRouteAndLocation(curRoute.path)) {
@@ -396,9 +398,13 @@ class Navigator extends Component {
               route = rout;
             }
             
-            ctx.refs.nav.push(route, ()=>{
-                historyProxy.push(apath);
-            });
+            if (ctx.refs.nav)
+              ctx.refs.nav.push(route, ()=>{
+                  historyProxy.push(apath);
+              });
+            else
+              ctx.__willPushPage = route;
+
             if (ctx._getCurNavHidden(route) != barHide) {
               ctx.setState({});
             }
@@ -433,9 +439,13 @@ class Navigator extends Component {
               route = rout;
             }
 
-            ctx.refs.nav.replace(route, ()=>{
-                historyProxy.push(apath);
-            });
+            if (ctx.refs.nav)
+              ctx.refs.nav.replace(route, ()=>{
+                  historyProxy.push(apath);
+              });
+            else
+              ctx.__willPushPage = route;
+
             if (ctx._getCurNavHidden(route) != barHide) {
               ctx.setState({});
             }
@@ -497,14 +507,18 @@ class Navigator extends Component {
             let rout = renderProps.routes[renderProps.routes.length-2];
             rout = _extends({}, rout, {params:renderProps.params, query:renderProps.location.query}); 
 
-            ctx.refs.nav.pushRouteToFront(rout, ()=>{
-              ctx.refs.nav.pop(()=>{
-                  historyProxy.push(rout.path);
+            if (ctx.refs.nav)
+              ctx.refs.nav.pushRouteToFront(rout, ()=>{
+                ctx.refs.nav.pop(()=>{
+                    historyProxy.push(rout.path);
+                });
+                if (ctx._getCurNavHidden() != barHide) {
+                  ctx.setState({});
+                }
               });
-              if (ctx._getCurNavHidden() != barHide) {
-                ctx.setState({});
-              }
-            });
+            else
+              ctx.__willPushPage = rout;
+
           }
         }
       });
@@ -520,15 +534,19 @@ class Navigator extends Component {
         if (renderProps)
         {
           let route = renderProps.routes.length > 0 ? renderProps.routes[0] : null;
-          route = _extends({}, route, {params:renderProps.params, query:renderProps.location.query, path:'/'}); 
-          ctx.refs.nav.pushRouteToFront(route, ()=>{
-            ctx.refs.nav.popToTop(()=>{
-                historyProxy.push('/');
+          route = _extends({}, route, {params:renderProps.params, query:renderProps.location.query, path:'/'});
+
+          if (ctx.refs.nav)
+            ctx.refs.nav.pushRouteToFront(route, ()=>{
+              ctx.refs.nav.popToTop(()=>{
+                  historyProxy.push('/');
+              });
+              if (ctx._getCurNavHidden() != barHide) {
+                ctx.setState({});
+              }
             });
-            if (ctx._getCurNavHidden() != barHide) {
-              ctx.setState({});
-            }
-          });
+          else
+            ctx.__willPushPage = route;
         }
       });
     }
@@ -572,9 +590,13 @@ class Navigator extends Component {
               route = rout;
             }
 
-            ctx.refs.nav.popToRoute(route, ()=>{
-              historyProxy.push(apath);
-            });
+            if (ctx.refs.nav)
+              ctx.refs.nav.popToRoute(route, ()=>{
+                historyProxy.push(apath);
+              });
+            else
+              ctx.__willPushPage = route;
+
             if (ctx._getCurNavHidden(route) != barHide) {
               ctx.setState({});
             }
@@ -604,7 +626,11 @@ class Navigator extends Component {
             route = rout;
           }
 
-          ctx.refs.nav.resetTo(route);
+          if (ctx.refs.nav)
+            ctx.refs.nav.resetTo(route);
+          else
+            ctx.__willPushPage = route;
+
           historyProxy.push(apath);
           if (ctx._getCurNavHidden(route) != barHide) {
             ctx.setState({});
@@ -617,6 +643,11 @@ class Navigator extends Component {
   _routeIsExist(apath) {
     if (this.refs && this.refs.nav)
     {
+      let i = apath.indexOf('#');
+      if (i > 0) { apath = apath.substring(0, i); }
+      i = apath.indexOf('?');
+      if (i > 0) { apath = apath.substring(0, i); }
+
       let routes = this.refs.nav.getCurrentRoutes();
       for (let i = 0; i < routes.length; i++) {
         if (routes[i].path == apath)
@@ -629,6 +660,11 @@ class Navigator extends Component {
   _getRouteByPath(apath) {
     if (this.refs && this.refs.nav)
     {
+      let i = apath.indexOf('#');
+      if (i > 0) { apath = apath.substring(0, i); }
+      i = apath.indexOf('?');
+      if (i > 0) { apath = apath.substring(0, i); }
+
       let routes = this.refs.nav.getCurrentRoutes();
       for (let i = 0; i < routes.length; i++) {
         if (routes[i].path == apath)
@@ -743,8 +779,18 @@ class Navigator extends Component {
         query[ee[0]] = ee[1];
       });
     }
+    query = query || {};
 
-    if ((query && !deepEqual(query, location.query))
+    i = apath.indexOf('#');
+    let hash;
+    if (i > 0) {
+      pathname = apath.substring(0, i);
+      hash = apath.substring(i);
+    }
+    hash = hash || '';
+
+    if (!deepEqual(query, location.query)
+      || (hash!=location.hash)
       || (location.pathname != pathname && !(pathname == '/' && location.pathname == '')))
     {
       return true;

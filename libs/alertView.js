@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     height:          view_height,
     backgroundColor: 'rgb(255, 255, 255)',
     borderRadius:    6,
-    borderColor:     '#eeeeee',
+    borderColor:     'rgb(177, 177, 177)',
     borderWidth:     1,
     zIndex:          1000001
   },
