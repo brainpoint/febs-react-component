@@ -76,9 +76,9 @@ Button.textStyle = null;
 const styles = StyleSheet.create({
   btn: {
     justifyContent: 'center',
-    backgroundColor: '#48ef3b',
+    backgroundColor: '#1aac19',
     borderRadius: 7,
-    borderColor: '#67ea5d',
+    borderColor: '#2d8f37',
     borderWidth: 1,
   },
   btnText: {

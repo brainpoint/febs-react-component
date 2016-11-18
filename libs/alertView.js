@@ -551,9 +551,9 @@ const styles = StyleSheet.create({
     width:           loading_size,
     height:          loading_size,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius:    6,
-    borderColor:     '#eeeeee',
-    borderWidth:     1,
+    borderRadius:    4,
+    // borderColor:     '#353535',
+    // borderWidth:     1,
     zIndex:          1000000
   },
   loadingContentContainer: {
