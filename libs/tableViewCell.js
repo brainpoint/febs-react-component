@@ -65,14 +65,14 @@ export default class TableViewCell extends Component {
     if (this.props.onPress)
       return (
         <TouchableHighlight onPress={this.props.onPress}>
-          <View style={[styles.tableCell, styles.split]}>
+          <View style={[styles.tableCell, styles.split, this.props.style]}>
             {getTitleElement(this.state.left)}{this.state.right}
           </View>
         </TouchableHighlight>
       );
     else
       return (
-        <View style={[styles.tableCell, styles.split]}>
+        <View style={[styles.tableCell, styles.split, this.props.style]}>
           {getTitleElement(this.state.left)}{this.state.right}
         </View>
       );
