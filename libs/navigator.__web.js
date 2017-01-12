@@ -690,6 +690,10 @@ class Navigator extends Component {
   
   _getCurNavHidden(curRoute=null) {
     var has = this.state.navigationBarHidden;
+    if (curRoute && (curRoute.barHidden===true||curRoute.barHidden===false)) {
+      has = curRoute.barHidden;
+      return has;
+    }
     
     if (this.refs.nav)
     {
