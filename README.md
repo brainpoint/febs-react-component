@@ -1,4 +1,4 @@
-# Citong React Component
+# Febs React Component
 
 > A component framework for React Native / React Web.
 
@@ -35,15 +35,38 @@
 
 ### React Native/Web compatible
 
-see demo.
+see [demo](./demo).
 
 #### Components
+
 * AlertView
+
+    ![](demo/ui/alertView.jpg)
+    ![](demo/ui/loadding.jpg)
+    ![](demo/ui/toast.jpg)
+
 * Button
+
+    ![](demo/ui/button.jpg)
+
 * Icons
+
+    ![](demo/ui/icons.jpg)
+
 * Navigator
+
+    ![](demo/ui/nav.jpg)
+
 * Page
+
+    ![](demo/ui/page.jpg)
+
 * RefreshListView    (from npm)
 * RefreshScrollView  (from npm)
 * TableViewCell
+
+    ![](demo/ui/tableViewCell.jpg)
+
 * TimerMgr
+    
+    timer管理; 可以在页面销毁时自动销毁存在的timer
