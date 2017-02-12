@@ -17,7 +17,7 @@ import ReactNative, {
 
 import deepEqual from 'deep-equal';
 import path from 'path';
-import { Router, Route, match, browserHistory } from 'react-router';
+import { Route, match, browserHistory } from 'react-router';
 
 import {styles, NAV_BAR_HEIGHT, STATUS_BAR_HEIGHT} from './navigator.style';
 import {getIconArrowLeft} from './icons';
@@ -831,52 +831,6 @@ class Navigator extends Component {
   }
 }; // class Navigator.
 
-
-// function getReactRouterRoutes(obj, rootPath) {
-//   let apath = obj.props.path;
-//   let children = null;
-
-//   if (obj.props.children) {
-//     if (obj.props.children instanceof Array)
-//     {
-//       children = [];
-//       obj.props.children.forEach(function(element) {
-//         children.push(getReactRouterRoutes(element, true));
-//       });
-//     }
-//     else
-//     {
-//       children = getReactRouterRoutes(obj.props.children, true)
-//     }
-//   }
-
-//   return (
-//     <Route path={apath} component={rootPath ? EmptyView : Navigator}>
-//       {children}
-//     </Route>
-//   );
-// }
-
-
-// class NavigatorRouter extends Component {
-//   //this._willNavHidden;
-//   constructor(props) {
-//     super(props);
-//     routerProps = props;
-
-//     // get react-router routes.
-//     this._config = getReactRouterRoutes(this.props.children);
-//   }
-
-//   render() {
-//     return (
-//         <Router history={browserHistory}>
-//           {this._config}
-//         </Router>
-//       );
-//   }
-// }
-//NavigatorRouter.SceneConfigs = ReactNative.Navigator.SceneConfigs;
 
 /**
 * @desc: 

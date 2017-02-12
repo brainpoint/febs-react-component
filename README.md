@@ -2,7 +2,18 @@
 
 > A component framework for React Native / React Web.
 
-### example
+
+# Install
+
+Use npm to install:
+
+```js
+npm install febs-react-component --save
+```
+  It will copy directory `node_modules/febs-react-component` to `node_modules/react-component`
+
+# Example
+
   see the files in path: ./demo/*.*
   ```js
   import React, { Component } from 'react';
@@ -33,11 +44,11 @@
   AppRegistry.registerComponent('app', () => app);
   ```
 
-### React Native/Web compatible
+# React Native/Web compatible
 
 see [demo](./demo).
 
-#### Components
+## Components
 
 * AlertView
 
