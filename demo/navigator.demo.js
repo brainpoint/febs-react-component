@@ -36,7 +36,7 @@ class app extends Component {
         defaultLeftButton={{ text: 'Back', }}
         defaultRightButton={{ text: 'Forward', onPress:()=> Navigator.pop() }} 
         defaultBarTintColor='#2112'
-        configureScene={(route, routeStack) => Navigator.SceneConfigs.FloatFromBottom}
+        configureScene={Navigator.SceneConfigs.FloatFromBottom} 
       >
         {/* route 可嵌套定义. */}
         {this.routeConfig()}
