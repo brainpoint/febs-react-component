@@ -42,6 +42,54 @@ var loading_size_content = 140;
 * @desc view class
 */
 export default class AlertView extends Component {
+
+
+  /**
+  * @desc: 显示对话框
+  * @param content:     显示的内容
+  * @param buttonArray: 按钮数组
+  * @param buttonContainerStyle: 按钮组的容器样式; 默认样式为 2按钮以下按行排列, 2按钮以上按列排列.
+  */
+  static showAlert = function(content, buttonArray, buttonContainerStyle, viewStyle) {
+    g_instance && g_instance.showAlert(content, buttonArray, buttonContainerStyle, viewStyle);
+  };
+
+  static hideAlert = function() {
+    g_instance && g_instance.hideAlert();
+  }
+
+  static isHiddenAlert = function() {
+    return !g_instance || g_instance.isHiddenAlert();
+  }
+
+  /**
+  * @desc: 显示加载对话框
+  * @param content:     显示的内容
+  */
+  static showLoading = function(content, viewStyle) {
+    g_instance && g_instance.showLoading(content, viewStyle);
+  };
+
+  static hideLoading = function() {
+    g_instance && g_instance.hideLoading();
+  }
+
+  static isHiddenLoading = function() {
+    return !g_instance || g_instance.isHiddenLoading();
+  }
+
+  static setDefaultStyle = function(opt) {
+    g_buttonContainerStyle = opt.buttonContainerStyle;
+    g_viewStyle = opt.viewStyle;
+    g_toastViewStyle = opt.toastViewStyle;
+    g_loadingViewStyle = opt.loadingViewStyle;
+  }
+
+  static toast = function(content, timeoutHide, viewStyle) {
+    g_instance && g_instance.toast(content, timeoutHide, viewStyle);
+  };
+
+
   constructor(props) {
     super(props);
     g_instance = this;
@@ -563,50 +611,3 @@ const styles = StyleSheet.create({
     justifyContent:  'center',
   },
 });
-
-
-/**
-* @desc: 显示对话框
-* @param content:     显示的内容
-* @param buttonArray: 按钮数组
-* @param buttonContainerStyle: 按钮组的容器样式; 默认样式为 2按钮以下按行排列, 2按钮以上按列排列.
-*/
-AlertView.showAlert = function(content, buttonArray, buttonContainerStyle, viewStyle) {
-  g_instance && g_instance.showAlert(content, buttonArray, buttonContainerStyle, viewStyle);
-};
-
-AlertView.hideAlert = function() {
-  g_instance && g_instance.hideAlert();
-}
-
-AlertView.isHiddenAlert = function() {
-  return !g_instance || g_instance.isHiddenAlert();
-}
-
-/**
-* @desc: 显示加载对话框
-* @param content:     显示的内容
-*/
-AlertView.showLoading = function(content, viewStyle) {
-  g_instance && g_instance.showLoading(content, viewStyle);
-};
-
-
-AlertView.hideLoading = function() {
-  g_instance && g_instance.hideLoading();
-}
-
-AlertView.isHiddenLoading = function() {
-  return !g_instance || g_instance.isHiddenLoading();
-}
-
-AlertView.setDefaultStyle = function(opt) {
-  g_buttonContainerStyle = opt.buttonContainerStyle;
-  g_viewStyle = opt.viewStyle;
-  g_toastViewStyle = opt.toastViewStyle;
-  g_loadingViewStyle = opt.loadingViewStyle;
-}
-
-AlertView.toast = function(content, timeoutHide, viewStyle) {
-  g_instance && g_instance.toast(content, timeoutHide, viewStyle);
-};

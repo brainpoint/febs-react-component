@@ -16,6 +16,21 @@ import {
 * @desc view class
 */
 export default class Button extends Component {
+
+  static propTypes = {
+    onPress                          : React.PropTypes.func,
+    style                            : View.propTypes.style,
+    disabled                         : React.PropTypes.bool,
+  };
+
+  static defaultProps = {
+    disabled                       : true,
+  };
+  static style = null;
+  static textStyle = null;
+  static disabledStyle = null;
+  static disabledTextStyle = null;
+
   constructor(props) {
     super(props);
   }
@@ -38,16 +53,16 @@ export default class Button extends Component {
 
     if (this.props.disabled) {
       return (
-        <View style={[style, styles.btnDisable]} >
-          {d ? d : <Text style={styles.btnDisableText}>{children}</Text>}
+        <View style={[styles.btnDisable, style, styles.btnDisableBg, Button.disabledStyle]} >
+          {d ? d : <Text style={[styles.btnDisableText, textStyle, styles.btnDisableTextColor, Button.disabledTextStyle]}>{children}</Text>}
         </View>
       );
     }
     else {
       return (
-        <TouchableOpacity  style={[Button.style ? Button.style : styles.btn, style]} onPress={onPress?onPress:null}>
+        <TouchableOpacity  style={[styles.btn, Button.style, style]} onPress={onPress?onPress:null}>
           <View>
-            {d ? d : <Text style={[Button.textStyle ? Button.textStyle : styles.btnText, textStyle]}>{children}</Text>}
+            {d ? d : <Text style={[styles.btnText, Button.textStyle, textStyle]}>{children}</Text>}
           </View>
         </TouchableOpacity>
       );
@@ -55,20 +70,6 @@ export default class Button extends Component {
   }
 }
 
-/**
- * Props Validation
- * @type {Object}
- */
-Button.propTypes = {
-  onPress                          : React.PropTypes.func,
-  style                            : View.propTypes.style,
-  disabled                         : React.PropTypes.bool,
-};
-Button.defaultProps = {
-  disabled                       : false,
-};
-Button.style = null;
-Button.textStyle = null;
 
 /**
 * @desc view style
@@ -92,18 +93,22 @@ const styles = StyleSheet.create({
   },
   btnDisable: {
     justifyContent: 'center',
-    backgroundColor: 'rgb(226, 222, 222)',
-    borderColor: 'rgb(202, 202, 202)',
     borderRadius: 7,
     borderWidth: 1,
   },
+  btnDisableBg: {
+    backgroundColor: 'rgb(226, 222, 222)',
+    borderColor: 'rgb(202, 202, 202)',
+  },
   btnDisableText: {
     alignSelf: 'center',
-    color: 'rgb(175, 172, 172)',
     paddingTop: 7,
     paddingBottom: 7,
     paddingLeft: 10,
     paddingRight: 10,
     fontSize: 15,
+  },
+  btnDisableTextColor: {
+    color: 'rgb(175, 172, 172)',
   }
 });

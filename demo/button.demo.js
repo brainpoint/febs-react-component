@@ -37,6 +37,13 @@ AppRegistry.registerComponent('app', () => app);
       
 *   Button.textStyle: Text.propTypes.style
       全局按钮的文字部分默认样式
+
+*   Button.disabledStyle: View.propTypes.style
+      全局disabled按钮的默认样式
+      
+*   Button.disabledTextStyle: Text.propTypes.style
+      全局disabled按钮的文字部分默认样式
+
 */
 
 //----------------------------------------------
