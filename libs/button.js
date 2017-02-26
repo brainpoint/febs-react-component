@@ -24,7 +24,7 @@ export default class Button extends Component {
   };
 
   static defaultProps = {
-    disabled                       : true,
+    disabled                       : false,
   };
   static style = null;
   static textStyle = null;

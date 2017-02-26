@@ -38,8 +38,8 @@ class app extends Component {
         defaultBarTintColor='#2112'
         configureScene={(route, routeStack) => Navigator.SceneConfigs.FloatFromBottom}
       >
-        // route 可嵌套定义.
-        {routeConfig()}
+        {/* route 可嵌套定义. */}
+        {this.routeConfig()}
 
       </Navigator>
     );

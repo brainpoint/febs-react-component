@@ -16,7 +16,7 @@ class app extends Component {
   render() {
     return (
       <TableViewCell
-        left={'dfsadf'}
+        left={{text:'dfsadf'}}
         right={Icons.getIconMinArrowRight()}
       />
     );
