@@ -12,7 +12,7 @@
 *     - 在使用计时器的函数中调用:   var t = this.timerMgr.setTimeout(fn, tm) / this.timerMgr.clearTimeout(t)
 *     - 清理全部使用: this.timerMgr.clearAll();
 */
-export default class {
+class TimerMgr {
   constructor() {
     this._timeoutList = [];
     // this._intervalList = [];
@@ -78,3 +78,38 @@ export default class {
   // }
 
 };
+
+
+/**
+* @desc: timer
+*/
+
+// window.requestAnimationFrame / window.cancelAnimationFrame
+var lastTime = 0;
+TimerMgr.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+
+TimerMgr.cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+
+if (!TimerMgr.requestAnimationFrame) {
+    TimerMgr.requestAnimationFrame = (callback)=>{
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+        var id = setTimeout(()=>{ callback(currTime + timeToCall); },
+          timeToCall);
+        lastTime = currTime + timeToCall;
+        return id;
+    };
+}
+
+if (!TimerMgr.cancelAnimationFrame) {
+    TimerMgr.cancelAnimationFrame = function(id) {
+        clearTimeout(id);
+    };
+}
+
+
+/**
+* @desc: export
+*/
+export default TimerMgr;

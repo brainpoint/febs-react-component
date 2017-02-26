@@ -81,3 +81,4 @@ see [demo](./demo).
 * TimerMgr
     
     timer管理; 可以在页面销毁时自动销毁存在的timer
+    统一封装 requestAnimationFrame / cancelAnimationFrame 方法
