@@ -15,23 +15,12 @@
 class TimerMgr {
   constructor() {
     this._timeoutList = [];
+    this._requestAniList = [];
     // this._intervalList = [];
   }
 
   dispose() {
-    for(let t of this._timeoutList) {
-      if (t) {
-        clearTimeout(t);
-      }
-    }
-    this._timeoutList = null;
-
-    // for(let t of this._intervalList) {
-    //   if (t) {
-    //     clearInterval(t);
-    //   }
-    // }
-    // this._intervalList = [];
+    this.clearAll();
   }
 
   setTimeout(fn, tm) {
@@ -47,14 +36,6 @@ class TimerMgr {
     return t;
   }
 
-  clearAll() {
-    for(let t of this._timeoutList) {
-      if (t) {
-        clearTimeout(t);
-      }
-    }
-  }
-
   clearTimeout(t) {
     if (!t) return;
     clearTimeout(t);
@@ -63,19 +44,51 @@ class TimerMgr {
       this._timeoutList.splice(i, 1);
   }
 
+  requestAnimationFrame(fn) {
+    if (!fn) return null;
+    let ctx = this;
+    let t = TimerMgr.requestAnimationFrame(function(tm){
+      fn(tm);
+      let i = ctx._requestAniList.indexOf(t);
+      if (i >= 0)
+        ctx._requestAniList.splice(i, 1);
+    });
+    if (t)
+      this._requestAniList.push(t);
+    return t;
+  }
+
+  cancelAnimationFrame(t) {
+    if (!t) return;
+    TimerMgr.cancelAnimationFrame(t);
+    let i = this._requestAniList.indexOf(t);
+    if (i >= 0)
+      this._requestAniList.splice(i, 1);
+  }
+
+  clearAllTimeout() {
+    for(let t of this._timeoutList) {
+      if (t) {
+        clearTimeout(t);
+      }
+    }
+    this._timeoutList = [];
+  }
   
-  // setInterval(fn, tm) {
-  //   let ctx = this;
-  //   let t = setInterval(function() {
-  //     fn();
-  //     let i = ctx._intervalList.indexOf(t);
-  //     t = null;
-  //     if (i >= 0)
-  //       ctx._intervalList.splice(i, 1);
-  //   }, tm);
-  //   if (t)
-  //     this._intervalList.push(t);
-  // }
+  clearAllAnimationFrame() {
+    for(let t of this._requestAniList) {
+      if (t) {
+        TimerMgr.cancelAnimationFrame(t);
+      }
+    }
+    this._requestAniList = [];
+  }
+  
+  clearAll() {
+    this.clearAllTimeout();
+    this.clearAllAnimationFrame();
+  }
+
 
 };
 

@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
 *    可在组件释放时自动释放所有的timeout计时器.
 *     - 在constructor中:          this.timerMgr = new TimerMgr();
 *     - 在componentWillUnmount中: this.timerMgr.dispose();
-*     - 在使用计时器的函数中调用:   var t = this.timerMgr.setTimeout(fn, tm) / this.timerMgr.clearTimeout(t)
-*     - 清理全部使用: this.timerMgr.clearAll();
+*     - 在使用计时器的函数中调用:            var t = this.timerMgr.setTimeout(fn, tm) / this.timerMgr.clearTimeout(t)
+*     - 在使用animationFrame的函数中调用:   var t = this.timerMgr.requestAnimationFrame(fn) / this.timerMgr.cancelAnimationFrame(t)
+*     - 清理全部使用: this.timerMgr.clearAll(); this.timerMgr.clearAllTimeout(); this.timerMgr.clearAllAnimationFrame();
 */
