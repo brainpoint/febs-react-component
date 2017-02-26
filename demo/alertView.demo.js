@@ -66,6 +66,7 @@ AppRegistry.registerComponent('app', () => app);
             style:      PropTypes.object,
           }
         2.或者为react元素，如<Text></Text>
+        3.或者为string
       @param buttonArray 按钮数组.
         1.属性对象
           { 
@@ -96,6 +97,7 @@ AppRegistry.registerComponent('app', () => app);
             style:      PropTypes.object,
           }
         2.或者为react元素，如<Text></Text>
+        3.或者为string
       @param viewStyle 警告框样式.
         PropTypes.object
 *
@@ -110,6 +112,7 @@ AppRegistry.registerComponent('app', () => app);
             style:      PropTypes.object,
           }
         2.或者为react元素，如<Text></Text>
+        3.或者为string
       @param timeoutHide 多久之后关闭
       @param viewStyle 警告框样式.
         PropTypes.object

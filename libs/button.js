@@ -36,7 +36,7 @@ export default class Button extends Component {
     const children = this.text;
     const d = children ? ((!!children.props)?children:null) : null;
 
-    if (this.props.disable) {
+    if (this.props.disabled) {
       return (
         <View style={[style, styles.btnDisable]} >
           {d ? d : <Text style={styles.btnDisableText}>{children}</Text>}
@@ -62,10 +62,10 @@ export default class Button extends Component {
 Button.propTypes = {
   onPress                          : React.PropTypes.func,
   style                            : View.propTypes.style,
-  disable                          : React.PropTypes.bool,
+  disabled                         : React.PropTypes.bool,
 };
 Button.defaultProps = {
-  disable                       : false,
+  disabled                       : false,
 };
 Button.style = null;
 Button.textStyle = null;

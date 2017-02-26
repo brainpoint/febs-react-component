@@ -43,7 +43,7 @@ AppRegistry.registerComponent('app', () => app);
 // @props
 //----------------------------------------------
 //-------------
-/*   disable: PropTypes.boolean
+/*   disabled: PropTypes.boolean
       
 *
 //-------------

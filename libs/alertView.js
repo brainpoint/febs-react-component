@@ -225,7 +225,7 @@ export default class AlertView extends Component {
       return this._av_content;
     }
 
-    const tt = this._av_content.text;
+    const tt = (typeof this._av_content === 'string') ? this._av_content : this._av_content.text;
     const sty   = this._av_content.style;
     const tintColor   = this._av_content.tintColor;
     const tintColors  = tintColor ? {color:tintColor} : null;
@@ -364,7 +364,7 @@ export default class AlertView extends Component {
       return this._av_content_toast;
     }
 
-    const tt = this._av_content_toast.text;
+    const tt = (typeof this._av_content_toast === 'string') ? this._av_content_toast : this._av_content_toast.text;
     const sty   = this._av_content_toast.style;
     const tintColor   = this._av_content_toast.tintColor;
     const tintColors  = tintColor ? {color:tintColor} : null;
@@ -408,7 +408,7 @@ export default class AlertView extends Component {
       return this._av_content_loading;
     }
 
-    const tt = this._av_content_loading ? this._av_content_loading.text : null;
+    const tt = (typeof this._av_content_loading === 'string') ? this._av_content_loading : (this._av_content_loading ? this._av_content_loading.text : null);
     const sty   = this._av_content_loading ? this._av_content_loading.style : null;
     const tintColor   = this._av_content_loading ? this._av_content_loading.tintColor : null;
     const tintColors  = tintColor ? {color:tintColor} : {color:'#ffffff'};
