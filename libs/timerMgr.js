@@ -4,6 +4,35 @@
 * Author: lipengxiang
 */
 
+
+/**
+* @desc: timer
+*/
+
+// window.requestAnimationFrame / window.cancelAnimationFrame
+var lastTime = 0;
+window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+
+window.cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+
+if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = (callback)=>{
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+        var id = setTimeout(()=>{ callback(currTime + timeToCall); },
+          timeToCall);
+        lastTime = currTime + timeToCall;
+        return id;
+    };
+}
+
+if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function(id) {
+        clearTimeout(id);
+    };
+}
+
 /**
 * @desc view class
 *    可在组件释放时自动释放所有的timeout计时器.
@@ -47,7 +76,7 @@ class TimerMgr {
   requestAnimationFrame(fn) {
     if (!fn) return null;
     let ctx = this;
-    let t = TimerMgr.requestAnimationFrame(function(tm){
+    let t = window.requestAnimationFrame(function(tm){
       fn(tm);
       let i = ctx._requestAniList.indexOf(t);
       if (i >= 0)
@@ -60,7 +89,7 @@ class TimerMgr {
 
   cancelAnimationFrame(t) {
     if (!t) return;
-    TimerMgr.cancelAnimationFrame(t);
+    window.cancelAnimationFrame(t);
     let i = this._requestAniList.indexOf(t);
     if (i >= 0)
       this._requestAniList.splice(i, 1);
@@ -91,35 +120,6 @@ class TimerMgr {
 
 
 };
-
-
-/**
-* @desc: timer
-*/
-
-// window.requestAnimationFrame / window.cancelAnimationFrame
-var lastTime = 0;
-TimerMgr.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
-TimerMgr.cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
-
-if (!TimerMgr.requestAnimationFrame) {
-    TimerMgr.requestAnimationFrame = (callback)=>{
-        var currTime = new Date().getTime();
-        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-        var id = setTimeout(()=>{ callback(currTime + timeToCall); },
-          timeToCall);
-        lastTime = currTime + timeToCall;
-        return id;
-    };
-}
-
-if (!TimerMgr.cancelAnimationFrame) {
-    TimerMgr.cancelAnimationFrame = function(id) {
-        clearTimeout(id);
-    };
-}
 
 
 /**
