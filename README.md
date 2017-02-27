@@ -3,6 +3,8 @@
 > A component framework for React Native / React Web.
 
 
+[![NPM](https://nodei.co/npm/febs-react-component.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/febs-react-component/)
+
 # Install
 
 Use npm to install:
