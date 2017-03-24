@@ -1,6 +1,6 @@
 {
   "name": "febs-react-component",
-  "version": "0.1.5",
+  "version": "0.1.9",
   "license": "BSD-3-Clause",
   "homepage": "https://github.com/brainpoint/febs-react-component#readme",
   "repository": {
@@ -19,11 +19,11 @@
   },
   "dependencies": {
     "deep-equal": "^1.0.1",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
     "react-router": "^3.0.0"
   },
   "devDependencies": {
-    "febs": "0.1.1"
+    "febs": "^0.1.9"
   }
 }
